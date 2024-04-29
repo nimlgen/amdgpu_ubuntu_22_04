@@ -15,6 +15,7 @@ mkdir build
 sudo dkms build -m amdgpu -v 6.7.0-1756574.22.04 --sourcetree=`pwd` --dkmstree=`pwd`/build
 sudo rmmod amdgpu
 sudo insmod `pwd`/build/amdgpu/6.7.0-1756574.22.04/5.15.0-105-generic/x86_64/module/amdgpu.ko
+# note: module will reset to default after reboot
 
 # validate
 sudo cat /sys/module/amdgpu/parameters/cwsr_enable #= 0
