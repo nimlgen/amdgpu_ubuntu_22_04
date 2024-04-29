@@ -212,6 +212,7 @@ extern int amdgpu_mcbp;
 extern int amdgpu_discovery;
 extern int amdgpu_mes;
 extern int amdgpu_mes_kiq;
+extern int amdgpu_mes_resp_timeout;
 extern int amdgpu_noretry;
 extern int amdgpu_force_asic_type;
 extern int amdgpu_smartshift_bias;

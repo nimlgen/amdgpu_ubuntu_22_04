@@ -200,6 +200,7 @@ int amdgpu_mcbp = -1;
 int amdgpu_discovery = -1;
 int amdgpu_mes;
 int amdgpu_mes_kiq;
+int amdgpu_mes_resp_timeout = -1; /* auto */
 int amdgpu_noretry = -1;
 int amdgpu_force_asic_type = -1;
 int amdgpu_tmz = -1; /* auto */
@@ -681,6 +682,14 @@ module_param_named(mes, amdgpu_mes, int, 0444);
 MODULE_PARM_DESC(mes_kiq,
 	"Enable Micro Engine Scheduler KIQ (0 = disabled (default), 1 = enabled)");
 module_param_named(mes_kiq, amdgpu_mes_kiq, int, 0444);
+
+/**
+ * DOC: mes_resp_timeout (int)
+ * Defines the response timeout interval for MES. If MES fails to respond within this period, the kernel will classify MES as non-responsive.
+ */
+MODULE_PARM_DESC(mes_resp_timeout,
+	"Specifies the MES response timeout duration in microseconds. Use -1 to apply the kernel's default setting.");
+module_param_named(mes_resp_timeout, amdgpu_mes_resp_timeout, int, 0444);
 
 /**
  * DOC: noretry (int)
