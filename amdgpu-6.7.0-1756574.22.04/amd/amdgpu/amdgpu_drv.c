@@ -200,7 +200,7 @@ int amdgpu_mcbp = -1;
 int amdgpu_discovery = -1;
 int amdgpu_mes;
 int amdgpu_mes_kiq;
-int amdgpu_mes_resp_timeout = -1; /* auto */
+int amdgpu_mes_resp_timeout = 10 * 1000 * 1000; /* 10s */
 int amdgpu_noretry = -1;
 int amdgpu_force_asic_type = -1;
 int amdgpu_tmz = -1; /* auto */
@@ -743,12 +743,12 @@ MODULE_PARM_DESC(hws_max_conc_proc,
 /**
  * DOC: cwsr_enable (int)
  * CWSR(compute wave store and resume) allows the GPU to preempt shader execution in
- * the middle of a compute wave. Default is 1 to enable this feature. Setting 0
- * disables it.
+ * the middle of a compute wave. Default is 0 to disable this feature. Setting 1
+ * enables it.
  */
-int cwsr_enable = 1;
+int cwsr_enable = 0;
 module_param(cwsr_enable, int, 0444);
-MODULE_PARM_DESC(cwsr_enable, "CWSR enable (0 = Off, 1 = On (Default))");
+MODULE_PARM_DESC(cwsr_enable, "CWSR enable (0 = Off (Default), 1 = On)");
 
 /**
  * DOC: max_num_of_queues_per_device (int)
