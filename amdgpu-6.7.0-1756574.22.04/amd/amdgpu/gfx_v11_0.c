@@ -537,6 +537,7 @@ static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 	DRM_DEBUG("\n");
 
 	amdgpu_ucode_ip_version_decode(adev, GC_HWIP, ucode_prefix, sizeof(ucode_prefix));
+	dev_info(adev->dev, "ip_ver: %s\n", ucode_prefix);
 
 	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_pfp.bin", ucode_prefix);
 	err = amdgpu_ucode_request(adev, &adev->gfx.pfp_fw, fw_name);
