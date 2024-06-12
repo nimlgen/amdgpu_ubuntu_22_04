@@ -11,10 +11,10 @@ sudo reboot
 ### 2. Build the driver
 ```bash
 # cd to the git repo
-mkdir build
-sudo dkms build -m amdgpu -v 6.7.0-1756574.22.04 --sourcetree=`pwd` --dkmstree=`pwd`/build
+mkdir build_60102
+sudo dkms build_60102 -m amdgpu -v 6.7.0-1781449.22.04 --sourcetree=`pwd` --dkmstree=`pwd`/build_60102
 sudo rmmod amdgpu
-sudo insmod `pwd`/build/amdgpu/6.7.0-1756574.22.04/5.15.0-105-generic/x86_64/module/amdgpu.ko
+sudo insmod `pwd`/build_60102/amdgpu/6.7.0-1781449.22.04/`uname -r`/x86_64/module/amdgpu.ko
 # note: module will reset to default after reboot
 
 # validate
