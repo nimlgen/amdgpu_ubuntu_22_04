@@ -161,7 +161,7 @@ static int mes_v11_0_submit_pkt_and_poll_completion(struct amdgpu_mes *mes,
 	struct amdgpu_device *adev = mes->adev;
 	struct amdgpu_ring *ring = &mes->ring;
 	unsigned long flags;
-	signed long timeout = 3000000; /* 3000 ms */
+	signed long timeout = 20000000; /* 20000 ms */
 	const char *op_str, *misc_op_str;
 	u32 fence_offset;
 	u64 fence_gpu_addr;
@@ -230,6 +230,9 @@ static int mes_v11_0_submit_pkt_and_poll_completion(struct amdgpu_mes *mes,
 			schedule();
 
 		return -ETIMEDOUT;
+	} else if ((timeout - r) / 1000 > 100) {
+		DRM_WARN("MES msg=%d response took %ld ms\n",
+				 x_pkt->header.opcode, (timeout - r) / 1000);
 	}
 
 	return 0;

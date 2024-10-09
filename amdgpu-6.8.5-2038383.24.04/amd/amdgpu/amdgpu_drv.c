@@ -763,9 +763,9 @@ MODULE_PARM_DESC(hws_max_conc_proc,
  * the middle of a compute wave. Default is 1 to enable this feature. Setting 0
  * disables it.
  */
-int cwsr_enable = 1;
+int cwsr_enable = 0;
 module_param(cwsr_enable, int, 0444);
-MODULE_PARM_DESC(cwsr_enable, "CWSR enable (0 = Off, 1 = On (Default))");
+MODULE_PARM_DESC(cwsr_enable, "CWSR enable (0 = Off (Default), 1 = On)");
 
 /**
  * DOC: max_num_of_queues_per_device (int)
