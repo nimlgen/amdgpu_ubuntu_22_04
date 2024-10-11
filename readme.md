@@ -1,7 +1,6 @@
 ## Installation:
 
-### 1. Install amdgpu driver v6.8.5
-### 2. Build and install the driver
+### 1. Build and install the custom driver with install.sh script.
 ```bash
 ./install.sh
 ```
