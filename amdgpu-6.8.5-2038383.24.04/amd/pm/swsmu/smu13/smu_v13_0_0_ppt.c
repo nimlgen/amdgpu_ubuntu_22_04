@@ -2127,8 +2127,6 @@ static void smu_v13_0_0_set_supported_od_feature_mask(struct smu_context *smu)
 
 static int smu_v13_0_0_set_default_od_settings(struct smu_context *smu)
 {
-	dev_info(smu->adev->dev, "Setting default OD settings\n");
-
 	OverDriveTableExternal_t *od_table =
 		(OverDriveTableExternal_t *)smu->smu_table.overdrive_table;
 	OverDriveTableExternal_t *boot_od_table =
@@ -2198,9 +2196,7 @@ static int smu_v13_0_0_set_default_od_settings(struct smu_context *smu)
 }
 
 static int smu_v13_0_0_restore_user_od_settings(struct smu_context *smu)
-{	
-	dev_info(smu->adev->dev, "Restoring user OD settings\n");
-
+{
 	struct smu_table_context *table_context = &smu->smu_table;
 	OverDriveTableExternal_t *od_table = table_context->overdrive_table;
 	OverDriveTableExternal_t *user_od_table = table_context->user_overdrive_table;
@@ -2335,8 +2331,6 @@ static int smu_v13_0_0_enable_mgpu_fan_boost(struct smu_context *smu)
 	struct smu_table_context *table_context = &smu->smu_table;
 	PPTable_t *pptable = table_context->driver_pptable;
 	SkuTable_t *skutable = &pptable->SkuTable;
-
-	dev_info(smu->adev->dev, "Enable MGpu Fan Boost\n");
 
 	/*
 	 * Skip the MGpuFanBoost setting for those ASICs
@@ -2487,100 +2481,98 @@ static int smu_v13_0_0_set_power_profile_mode(struct smu_context *smu,
 					      long *input,
 					      uint32_t size)
 {
-	// DpmActivityMonitorCoeffIntExternal_t activity_monitor_external;
-	// DpmActivityMonitorCoeffInt_t *activity_monitor =
-	// 	&(activity_monitor_external.DpmActivityMonitorCoeffInt);
-	// int workload_type, ret = 0;
-	// u32 workload_mask;
+	DpmActivityMonitorCoeffIntExternal_t activity_monitor_external;
+	DpmActivityMonitorCoeffInt_t *activity_monitor =
+		&(activity_monitor_external.DpmActivityMonitorCoeffInt);
+	int workload_type, ret = 0;
+	u32 workload_mask;
 
-	// smu->power_profile_mode = input[size];
+	smu->power_profile_mode = input[size];
 
-	// if (smu->power_profile_mode >= PP_SMC_POWER_PROFILE_COUNT) {
-	// 	dev_err(smu->adev->dev, "Invalid power profile mode %d\n", smu->power_profile_mode);
-	// 	return -EINVAL;
-	// }
+	if (smu->power_profile_mode >= PP_SMC_POWER_PROFILE_COUNT) {
+		dev_err(smu->adev->dev, "Invalid power profile mode %d\n", smu->power_profile_mode);
+		return -EINVAL;
+	}
 
-	// if (smu->power_profile_mode == PP_SMC_POWER_PROFILE_CUSTOM) {
-	// 	if (size != 9)
-	// 		return -EINVAL;
+	if (smu->power_profile_mode == PP_SMC_POWER_PROFILE_CUSTOM) {
+		if (size != 9)
+			return -EINVAL;
 
-	// 	ret = smu_cmn_update_table(smu,
-	// 				   SMU_TABLE_ACTIVITY_MONITOR_COEFF,
-	// 				   WORKLOAD_PPLIB_CUSTOM_BIT,
-	// 				   (void *)(&activity_monitor_external),
-	// 				   false);
-	// 	if (ret) {
-	// 		dev_err(smu->adev->dev, "[%s] Failed to get activity monitor!", __func__);
-	// 		return ret;
-	// 	}
+		ret = smu_cmn_update_table(smu,
+					   SMU_TABLE_ACTIVITY_MONITOR_COEFF,
+					   WORKLOAD_PPLIB_CUSTOM_BIT,
+					   (void *)(&activity_monitor_external),
+					   false);
+		if (ret) {
+			dev_err(smu->adev->dev, "[%s] Failed to get activity monitor!", __func__);
+			return ret;
+		}
 
-	// 	switch (input[0]) {
-	// 	case 0: /* Gfxclk */
-	// 		activity_monitor->Gfx_FPS = input[1];
-	// 		activity_monitor->Gfx_MinActiveFreqType = input[2];
-	// 		activity_monitor->Gfx_MinActiveFreq = input[3];
-	// 		activity_monitor->Gfx_BoosterFreqType = input[4];
-	// 		activity_monitor->Gfx_BoosterFreq = input[5];
-	// 		activity_monitor->Gfx_PD_Data_limit_c = input[6];
-	// 		activity_monitor->Gfx_PD_Data_error_coeff = input[7];
-	// 		activity_monitor->Gfx_PD_Data_error_rate_coeff = input[8];
-	// 		break;
-	// 	case 1: /* Fclk */
-	// 		activity_monitor->Fclk_FPS = input[1];
-	// 		activity_monitor->Fclk_MinActiveFreqType = input[2];
-	// 		activity_monitor->Fclk_MinActiveFreq = input[3];
-	// 		activity_monitor->Fclk_BoosterFreqType = input[4];
-	// 		activity_monitor->Fclk_BoosterFreq = input[5];
-	// 		activity_monitor->Fclk_PD_Data_limit_c = input[6];
-	// 		activity_monitor->Fclk_PD_Data_error_coeff = input[7];
-	// 		activity_monitor->Fclk_PD_Data_error_rate_coeff = input[8];
-	// 		break;
-	// 	default:
-	// 		return -EINVAL;
-	// 	}
+		switch (input[0]) {
+		case 0: /* Gfxclk */
+			activity_monitor->Gfx_FPS = input[1];
+			activity_monitor->Gfx_MinActiveFreqType = input[2];
+			activity_monitor->Gfx_MinActiveFreq = input[3];
+			activity_monitor->Gfx_BoosterFreqType = input[4];
+			activity_monitor->Gfx_BoosterFreq = input[5];
+			activity_monitor->Gfx_PD_Data_limit_c = input[6];
+			activity_monitor->Gfx_PD_Data_error_coeff = input[7];
+			activity_monitor->Gfx_PD_Data_error_rate_coeff = input[8];
+			break;
+		case 1: /* Fclk */
+			activity_monitor->Fclk_FPS = input[1];
+			activity_monitor->Fclk_MinActiveFreqType = input[2];
+			activity_monitor->Fclk_MinActiveFreq = input[3];
+			activity_monitor->Fclk_BoosterFreqType = input[4];
+			activity_monitor->Fclk_BoosterFreq = input[5];
+			activity_monitor->Fclk_PD_Data_limit_c = input[6];
+			activity_monitor->Fclk_PD_Data_error_coeff = input[7];
+			activity_monitor->Fclk_PD_Data_error_rate_coeff = input[8];
+			break;
+		default:
+			return -EINVAL;
+		}
 
-	// 	ret = smu_cmn_update_table(smu,
-	// 				   SMU_TABLE_ACTIVITY_MONITOR_COEFF,
-	// 				   WORKLOAD_PPLIB_CUSTOM_BIT,
-	// 				   (void *)(&activity_monitor_external),
-	// 				   true);
-	// 	if (ret) {
-	// 		dev_err(smu->adev->dev, "[%s] Failed to set activity monitor!", __func__);
-	// 		return ret;
-	// 	}
-	// }
+		ret = smu_cmn_update_table(smu,
+					   SMU_TABLE_ACTIVITY_MONITOR_COEFF,
+					   WORKLOAD_PPLIB_CUSTOM_BIT,
+					   (void *)(&activity_monitor_external),
+					   true);
+		if (ret) {
+			dev_err(smu->adev->dev, "[%s] Failed to set activity monitor!", __func__);
+			return ret;
+		}
+	}
 
-	// /* conv PP_SMC_POWER_PROFILE* to WORKLOAD_PPLIB_*_BIT */
-	// workload_type = smu_cmn_to_asic_specific_index(smu,
-	// 					       CMN2ASIC_MAPPING_WORKLOAD,
-	// 					       smu->power_profile_mode);
+	/* conv PP_SMC_POWER_PROFILE* to WORKLOAD_PPLIB_*_BIT */
+	workload_type = smu_cmn_to_asic_specific_index(smu,
+						       CMN2ASIC_MAPPING_WORKLOAD,
+						       smu->power_profile_mode);
 
-	// if (workload_type < 0)
-	// 	return -EINVAL;
+	if (workload_type < 0)
+		return -EINVAL;
 
-	// workload_mask = 1 << workload_type;
+	workload_mask = 1 << workload_type;
 
-	// /* Add optimizations for SMU13.0.0/10.  Reuse the power saving profile */
-	// if (smu->power_profile_mode == PP_SMC_POWER_PROFILE_COMPUTE) {
-	// 	if ((amdgpu_ip_version(smu->adev, MP1_HWIP, 0) == IP_VERSION(13, 0, 0) &&
-	// 		((smu->adev->pm.fw_version == 0x004e6601) ||
-	// 		(smu->adev->pm.fw_version >= 0x004e7300))) ||
-	// 		(amdgpu_ip_version(smu->adev, MP1_HWIP, 0) == IP_VERSION(13, 0, 10) &&
-	// 		 smu->adev->pm.fw_version >= 0x00504500)) {
-	// 		workload_type = smu_cmn_to_asic_specific_index(smu,
-	// 							CMN2ASIC_MAPPING_WORKLOAD,
-	// 							PP_SMC_POWER_PROFILE_POWERSAVING);
-	// 		if (workload_type >= 0)
-	// 			workload_mask |= 1 << workload_type;
-	// 	}
-	// }
+	/* Add optimizations for SMU13.0.0/10.  Reuse the power saving profile */
+	if (smu->power_profile_mode == PP_SMC_POWER_PROFILE_COMPUTE) {
+		if ((amdgpu_ip_version(smu->adev, MP1_HWIP, 0) == IP_VERSION(13, 0, 0) &&
+			((smu->adev->pm.fw_version == 0x004e6601) ||
+			(smu->adev->pm.fw_version >= 0x004e7300))) ||
+			(amdgpu_ip_version(smu->adev, MP1_HWIP, 0) == IP_VERSION(13, 0, 10) &&
+			 smu->adev->pm.fw_version >= 0x00504500)) {
+			workload_type = smu_cmn_to_asic_specific_index(smu,
+								CMN2ASIC_MAPPING_WORKLOAD,
+								PP_SMC_POWER_PROFILE_POWERSAVING);
+			if (workload_type >= 0)
+				workload_mask |= 1 << workload_type;
+		}
+	}
 
-	// return smu_cmn_send_smc_msg_with_param(smu,
-	// 				       SMU_MSG_SetWorkloadMask,
-	// 				       workload_mask,
-	// 				       NULL);
-
-	return 0;
+	return smu_cmn_send_smc_msg_with_param(smu,
+					       SMU_MSG_SetWorkloadMask,
+					       workload_mask,
+					       NULL);
 }
 
 static bool smu_v13_0_0_is_mode1_reset_supported(struct smu_context *smu)
@@ -2979,47 +2971,47 @@ static int smu_v13_0_0_set_power_limit(struct smu_context *smu,
 				       enum smu_ppt_limit_type limit_type,
 				       uint32_t limit)
 {
-	// PPTable_t *pptable = smu->smu_table.driver_pptable;
-	// SkuTable_t *skutable = &pptable->SkuTable;
-	// uint32_t msg_limit = skutable->MsgLimits.Power[PPT_THROTTLER_PPT0][POWER_SOURCE_AC];
-	// struct smu_table_context *table_context = &smu->smu_table;
-	// OverDriveTableExternal_t *od_table =
-	// 	(OverDriveTableExternal_t *)table_context->overdrive_table;
-	// int ret = 0;
+	PPTable_t *pptable = smu->smu_table.driver_pptable;
+	SkuTable_t *skutable = &pptable->SkuTable;
+	uint32_t msg_limit = skutable->MsgLimits.Power[PPT_THROTTLER_PPT0][POWER_SOURCE_AC];
+	struct smu_table_context *table_context = &smu->smu_table;
+	OverDriveTableExternal_t *od_table =
+		(OverDriveTableExternal_t *)table_context->overdrive_table;
+	int ret = 0;
 
-	// if (limit_type != SMU_DEFAULT_PPT_LIMIT)
-	// 	return -EINVAL;
+	if (limit_type != SMU_DEFAULT_PPT_LIMIT)
+		return -EINVAL;
 
-	// if (limit <= msg_limit) {
-	// 	if (smu->current_power_limit > msg_limit) {
-	// 		od_table->OverDriveTable.Ppt = 0;
-	// 		od_table->OverDriveTable.FeatureCtrlMask |= 1U << PP_OD_FEATURE_PPT_BIT;
+	if (limit <= msg_limit) {
+		if (smu->current_power_limit > msg_limit) {
+			od_table->OverDriveTable.Ppt = 0;
+			od_table->OverDriveTable.FeatureCtrlMask |= 1U << PP_OD_FEATURE_PPT_BIT;
 
-	// 		ret = smu_v13_0_0_upload_overdrive_table(smu, od_table);
-	// 		if (ret) {
-	// 			dev_err(smu->adev->dev, "Failed to upload overdrive table!\n");
-	// 			return ret;
-	// 		}
-	// 	}
-	// 	return smu_v13_0_set_power_limit(smu, limit_type, limit);
-	// } else if (smu->od_enabled) {
-	// 	ret = smu_v13_0_set_power_limit(smu, limit_type, msg_limit);
-	// 	if (ret)
-	// 		return ret;
+			ret = smu_v13_0_0_upload_overdrive_table(smu, od_table);
+			if (ret) {
+				dev_err(smu->adev->dev, "Failed to upload overdrive table!\n");
+				return ret;
+			}
+		}
+		return smu_v13_0_set_power_limit(smu, limit_type, limit);
+	} else if (smu->od_enabled) {
+		ret = smu_v13_0_set_power_limit(smu, limit_type, msg_limit);
+		if (ret)
+			return ret;
 
-	// 	od_table->OverDriveTable.Ppt = (limit * 100) / msg_limit - 100;
-	// 	od_table->OverDriveTable.FeatureCtrlMask |= 1U << PP_OD_FEATURE_PPT_BIT;
+		od_table->OverDriveTable.Ppt = (limit * 100) / msg_limit - 100;
+		od_table->OverDriveTable.FeatureCtrlMask |= 1U << PP_OD_FEATURE_PPT_BIT;
 
-	// 	ret = smu_v13_0_0_upload_overdrive_table(smu, od_table);
-	// 	if (ret) {
-	// 	  dev_err(smu->adev->dev, "Failed to upload overdrive table!\n");
-	// 	  return ret;
-	// 	}
+		ret = smu_v13_0_0_upload_overdrive_table(smu, od_table);
+		if (ret) {
+		  dev_err(smu->adev->dev, "Failed to upload overdrive table!\n");
+		  return ret;
+		}
 
-	// 	smu->current_power_limit = limit;
-	// } else {
-	// 	return -EINVAL;
-	// }
+		smu->current_power_limit = limit;
+	} else {
+		return -EINVAL;
+	}
 
 	return 0;
 }
