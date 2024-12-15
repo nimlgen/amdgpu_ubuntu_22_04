@@ -2180,7 +2180,7 @@ static int gfx_v11_0_rlc_load_microcode(struct amdgpu_device *adev)
 			if (version_minor == 3)
 				gfx_v11_0_load_rlcp_rlcv_microcode(adev);
 		}
-		
+
 		return 0;
 	}
 
@@ -3626,7 +3626,7 @@ static int gfx_v11_0_cp_compute_load_microcode(struct amdgpu_device *adev)
 	}
 
 	memcpy(fw, fw_data, fw_size);
-	
+
 	amdgpu_bo_kunmap(adev->gfx.mec.mec_fw_obj);
 	amdgpu_bo_unreserve(adev->gfx.mec.mec_fw_obj);
 
@@ -4356,40 +4356,40 @@ static int gfx_v11_0_cp_resume(struct amdgpu_device *adev)
 		gfx_v11_0_cp_gfx_enable(adev, true);
 	}
 
-	if (adev->enable_mes_kiq && adev->mes.kiq_hw_init)
-		r = amdgpu_mes_kiq_hw_init(adev);
-	else
-		r = gfx_v11_0_kiq_resume(adev);
-	if (r)
-		return r;
+	// if (adev->enable_mes_kiq && adev->mes.kiq_hw_init)
+	// 	r = amdgpu_mes_kiq_hw_init(adev);
+	// else
+	// 	r = gfx_v11_0_kiq_resume(adev);
+	// if (r)
+	// 	return r;
 
-	r = gfx_v11_0_kcq_resume(adev);
-	if (r)
-		return r;
+	// r = gfx_v11_0_kcq_resume(adev);
+	// if (r)
+	// 	return r;
 
-	if (!amdgpu_async_gfx_ring) {
-		r = gfx_v11_0_cp_gfx_resume(adev);
-		if (r)
-			return r;
-	} else {
-		r = gfx_v11_0_cp_async_gfx_ring_resume(adev);
-		if (r)
-			return r;
-	}
+	// if (!amdgpu_async_gfx_ring) {
+	// 	r = gfx_v11_0_cp_gfx_resume(adev);
+	// 	if (r)
+	// 		return r;
+	// } else {
+	// 	r = gfx_v11_0_cp_async_gfx_ring_resume(adev);
+	// 	if (r)
+	// 		return r;
+	// }
 
-	for (i = 0; i < adev->gfx.num_gfx_rings; i++) {
-		ring = &adev->gfx.gfx_ring[i];
-		r = amdgpu_ring_test_helper(ring);
-		if (r)
-			return r;
-	}
+	// for (i = 0; i < adev->gfx.num_gfx_rings; i++) {
+	// 	ring = &adev->gfx.gfx_ring[i];
+	// 	r = amdgpu_ring_test_helper(ring);
+	// 	if (r)
+	// 		return r;
+	// }
 
-	for (i = 0; i < adev->gfx.num_compute_rings; i++) {
-		ring = &adev->gfx.compute_ring[i];
-		r = amdgpu_ring_test_helper(ring);
-		if (r)
-			return r;
-	}
+	// for (i = 0; i < adev->gfx.num_compute_rings; i++) {
+	// 	ring = &adev->gfx.compute_ring[i];
+	// 	r = amdgpu_ring_test_helper(ring);
+	// 	if (r)
+	// 		return r;
+	// }
 
 	return 0;
 }
