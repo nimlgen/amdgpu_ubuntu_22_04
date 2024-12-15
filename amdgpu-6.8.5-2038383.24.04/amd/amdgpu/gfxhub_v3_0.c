@@ -379,25 +379,25 @@ static int gfxhub_v3_0_gart_enable(struct amdgpu_device *adev)
 
 static void gfxhub_v3_0_gart_disable(struct amdgpu_device *adev)
 {
-	// struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB(0)];
-	// u32 tmp;
-	// u32 i;
+	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB(0)];
+	u32 tmp;
+	u32 i;
 
-	// /* Disable all tables */
-	// for (i = 0; i < 16; i++)
-	// 	WREG32_SOC15_OFFSET(GC, 0, regGCVM_CONTEXT0_CNTL,
-	// 			    i * hub->ctx_distance, 0);
+	/* Disable all tables */
+	for (i = 0; i < 16; i++)
+		WREG32_SOC15_OFFSET(GC, 0, regGCVM_CONTEXT0_CNTL,
+				    i * hub->ctx_distance, 0);
 
-	// /* Setup TLB control */
-	// tmp = RREG32_SOC15(GC, 0, regGCMC_VM_MX_L1_TLB_CNTL);
-	// tmp = REG_SET_FIELD(tmp, GCMC_VM_MX_L1_TLB_CNTL, ENABLE_L1_TLB, 0);
-	// tmp = REG_SET_FIELD(tmp, GCMC_VM_MX_L1_TLB_CNTL,
-	// 		    ENABLE_ADVANCED_DRIVER_MODEL, 0);
-	// WREG32_SOC15(GC, 0, regGCMC_VM_MX_L1_TLB_CNTL, tmp);
+	/* Setup TLB control */
+	tmp = RREG32_SOC15(GC, 0, regGCMC_VM_MX_L1_TLB_CNTL);
+	tmp = REG_SET_FIELD(tmp, GCMC_VM_MX_L1_TLB_CNTL, ENABLE_L1_TLB, 0);
+	tmp = REG_SET_FIELD(tmp, GCMC_VM_MX_L1_TLB_CNTL,
+			    ENABLE_ADVANCED_DRIVER_MODEL, 0);
+	WREG32_SOC15(GC, 0, regGCMC_VM_MX_L1_TLB_CNTL, tmp);
 
-	// /* Setup L2 cache */
-	// WREG32_FIELD15_PREREG(GC, 0, GCVM_L2_CNTL, ENABLE_L2_CACHE, 0);
-	// WREG32_SOC15(GC, 0, regGCVM_L2_CNTL3, 0);
+	/* Setup L2 cache */
+	WREG32_FIELD15_PREREG(GC, 0, GCVM_L2_CNTL, ENABLE_L2_CACHE, 0);
+	WREG32_SOC15(GC, 0, regGCVM_L2_CNTL3, 0);
 }
 
 /**
@@ -412,47 +412,47 @@ static void gfxhub_v3_0_set_fault_enable_default(struct amdgpu_device *adev,
 	u32 tmp;
 
 	/* NO halt CP when page fault */
-	// tmp = RREG32_SOC15(GC, 0, regCP_DEBUG);
-	// tmp = REG_SET_FIELD(tmp, CP_DEBUG, CPG_UTCL1_ERROR_HALT_DISABLE, 1);
-	// WREG32_SOC15(GC, 0, regCP_DEBUG, tmp);
+	tmp = RREG32_SOC15(GC, 0, regCP_DEBUG);
+	tmp = REG_SET_FIELD(tmp, CP_DEBUG, CPG_UTCL1_ERROR_HALT_DISABLE, 1);
+	WREG32_SOC15(GC, 0, regCP_DEBUG, tmp);
 
-	// /* These registers are not accessible to VF-SRIOV.
-	//  * The PF will program them instead.
-	//  */
-	// if (amdgpu_sriov_vf(adev))
-	// 	return;
+	/* These registers are not accessible to VF-SRIOV.
+	 * The PF will program them instead.
+	 */
+	if (amdgpu_sriov_vf(adev))
+		return;
 
-	// tmp = RREG32_SOC15(GC, 0, regGCVM_L2_PROTECTION_FAULT_CNTL);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    RANGE_PROTECTION_FAULT_ENABLE_DEFAULT, value);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    PDE0_PROTECTION_FAULT_ENABLE_DEFAULT, value);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    PDE1_PROTECTION_FAULT_ENABLE_DEFAULT, value);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    PDE2_PROTECTION_FAULT_ENABLE_DEFAULT, value);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    TRANSLATE_FURTHER_PROTECTION_FAULT_ENABLE_DEFAULT,
-	// 		    value);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    NACK_PROTECTION_FAULT_ENABLE_DEFAULT, value);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    DUMMY_PAGE_PROTECTION_FAULT_ENABLE_DEFAULT, value);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    VALID_PROTECTION_FAULT_ENABLE_DEFAULT, value);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    READ_PROTECTION_FAULT_ENABLE_DEFAULT, value);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    WRITE_PROTECTION_FAULT_ENABLE_DEFAULT, value);
-	// tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 		    EXECUTE_PROTECTION_FAULT_ENABLE_DEFAULT, value);
-	// if (!value) {
-	// 	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 			CRASH_ON_NO_RETRY_FAULT, 1);
-	// 	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
-	// 			CRASH_ON_RETRY_FAULT, 1);
-	// }
-	// WREG32_SOC15(GC, 0, regGCVM_L2_PROTECTION_FAULT_CNTL, tmp);
+	tmp = RREG32_SOC15(GC, 0, regGCVM_L2_PROTECTION_FAULT_CNTL);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    RANGE_PROTECTION_FAULT_ENABLE_DEFAULT, value);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    PDE0_PROTECTION_FAULT_ENABLE_DEFAULT, value);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    PDE1_PROTECTION_FAULT_ENABLE_DEFAULT, value);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    PDE2_PROTECTION_FAULT_ENABLE_DEFAULT, value);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    TRANSLATE_FURTHER_PROTECTION_FAULT_ENABLE_DEFAULT,
+			    value);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    NACK_PROTECTION_FAULT_ENABLE_DEFAULT, value);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    DUMMY_PAGE_PROTECTION_FAULT_ENABLE_DEFAULT, value);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    VALID_PROTECTION_FAULT_ENABLE_DEFAULT, value);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    READ_PROTECTION_FAULT_ENABLE_DEFAULT, value);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    WRITE_PROTECTION_FAULT_ENABLE_DEFAULT, value);
+	tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+			    EXECUTE_PROTECTION_FAULT_ENABLE_DEFAULT, value);
+	if (!value) {
+		tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+				CRASH_ON_NO_RETRY_FAULT, 1);
+		tmp = REG_SET_FIELD(tmp, GCVM_L2_PROTECTION_FAULT_CNTL,
+				CRASH_ON_RETRY_FAULT, 1);
+	}
+	WREG32_SOC15(GC, 0, regGCVM_L2_PROTECTION_FAULT_CNTL, tmp);
 }
 
 static const struct amdgpu_vmhub_funcs gfxhub_v3_0_vmhub_funcs = {

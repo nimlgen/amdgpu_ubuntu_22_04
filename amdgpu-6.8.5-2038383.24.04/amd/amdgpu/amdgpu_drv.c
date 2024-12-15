@@ -157,7 +157,7 @@ int amdgpu_vm_size = -1;
 int amdgpu_vm_fragment_size = -1;
 int amdgpu_vm_block_size = -1;
 int amdgpu_vm_fault_stop;
-int amdgpu_vm_update_mode = 3;
+int amdgpu_vm_update_mode = -1;
 int amdgpu_exp_hw_support;
 int amdgpu_dc = -1;
 int amdgpu_sched_jobs = 32;
@@ -3109,7 +3109,7 @@ static struct drm_driver amdgpu_kms_driver = {
 
 const struct drm_driver amdgpu_partition_driver = {
 	.driver_features =
-	    DRIVER_GEM | DRIVER_RENDER | DRIVER_SYNCOBJ 
+	    DRIVER_GEM | DRIVER_RENDER | DRIVER_SYNCOBJ
 #ifdef HAVE_DRM_DRV_DRIVER_SYNCOBJ_TIMELINE
             | DRIVER_SYNCOBJ_TIMELINE
 #endif /* HAVE_DRM_DRV_DRIVER_SYNCOBJ_TIMELINE */

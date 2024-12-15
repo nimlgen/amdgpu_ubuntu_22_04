@@ -129,9 +129,9 @@ static int init_interrupts_v11(struct amdgpu_device *adev, uint32_t pipe_id,
 
 	lock_srbm(adev, mec, pipe, 0, 0);
 
-	// WREG32_SOC15(GC, 0, regCPC_INT_CNTL,
-	// 	CP_INT_CNTL_RING0__TIME_STAMP_INT_ENABLE_MASK |
-	// 	CP_INT_CNTL_RING0__OPCODE_ERROR_INT_ENABLE_MASK);
+	WREG32_SOC15(GC, 0, regCPC_INT_CNTL,
+		CP_INT_CNTL_RING0__TIME_STAMP_INT_ENABLE_MASK |
+		CP_INT_CNTL_RING0__OPCODE_ERROR_INT_ENABLE_MASK);
 
 	unlock_srbm(adev);
 
@@ -223,7 +223,7 @@ static int hqd_load_v11(struct amdgpu_device *adev, void *mqd, uint32_t pipe_id,
 			     CP_HQD_PQ_DOORBELL_CONTROL, DOORBELL_EN, 1);
 	WREG32(SOC15_REG_OFFSET(GC, 0, regCP_HQD_PQ_DOORBELL_CONTROL), data);
 
-	if (wptr && false) {
+	if (wptr) {
 		/* Don't read wptr with get_user because the user
 		 * context may not be accessible (if this function
 		 * runs in a work queue). Instead trigger a one-shot
@@ -265,9 +265,9 @@ static int hqd_load_v11(struct amdgpu_device *adev, void *mqd, uint32_t pipe_id,
 	}
 
 	/* Start the EOP fetcher */
-	// WREG32(SOC15_REG_OFFSET(GC, 0, regCP_HQD_EOP_RPTR),
-	//        REG_SET_FIELD(m->cp_hqd_eop_rptr,
-	// 		     CP_HQD_EOP_RPTR, INIT_FETCHER, 1));
+	WREG32(SOC15_REG_OFFSET(GC, 0, regCP_HQD_EOP_RPTR),
+	       REG_SET_FIELD(m->cp_hqd_eop_rptr,
+			     CP_HQD_EOP_RPTR, INIT_FETCHER, 1));
 
 	data = REG_SET_FIELD(m->cp_hqd_active, CP_HQD_ACTIVE, ACTIVE, 1);
 	WREG32(SOC15_REG_OFFSET(GC, 0, regCP_HQD_ACTIVE), data);
@@ -294,7 +294,7 @@ static int hiq_mqd_load_v11(struct amdgpu_device *adev, void *mqd,
 	pipe = (pipe_id % adev->gfx.mec.num_pipe_per_mec);
 
 	dev_info(adev->dev, "Load HIQ of pipe %d queue %d\n", pipe_id, queue_id);
-	
+
 	pr_debug("kfd: set HIQ, mec:%d, pipe:%d, queue:%d.\n",
 		 mec, pipe, queue_id);
 
@@ -710,7 +710,7 @@ static uint32_t trap_mask_map_sw_to_hw(uint32_t mask)
 	uint32_t ret;
 
 	// dev_info(adev->dev, "trap_mask_map_sw_to_hw: mask 0x%x\n", mask);
-	
+
 	ret = REG_SET_FIELD(0, SPI_GDBG_PER_VMID_CNTL, EXCP_EN, excp_en);
 	ret = REG_SET_FIELD(ret, SPI_GDBG_PER_VMID_CNTL, TRAP_ON_START, trap_on_start);
 	ret = REG_SET_FIELD(ret, SPI_GDBG_PER_VMID_CNTL, TRAP_ON_END, trap_on_end);

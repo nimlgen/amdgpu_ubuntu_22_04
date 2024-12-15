@@ -235,7 +235,7 @@ static bool event_interrupt_isr_v11(struct kfd_node *dev,
 					uint32_t *patched_ihre,
 					bool *patched_flag)
 {
-	return true;
+	// return true;
 
 	uint16_t source_id, client_id, pasid, vmid;
 	const uint32_t *data = ih_ring_entry;
