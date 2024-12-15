@@ -2168,27 +2168,27 @@ static void evict_process_worker(struct work_struct *work)
 	/* Process termination destroys this worker thread. So during the
 	 * lifetime of this thread, kfd_process p will be valid
 	 */
-	// p = container_of(dwork, struct kfd_process, eviction_work);
-	// trace_kfd_evict_process_worker_start(p);
+	p = container_of(dwork, struct kfd_process, eviction_work);
+	trace_kfd_evict_process_worker_start(p);
 
-	// p->last_evict_timestamp = get_jiffies_64();
+	p->last_evict_timestamp = get_jiffies_64();
 
-	// pr_debug("Started evicting pasid 0x%x\n", p->pasid);
-	// ret = kfd_process_evict_queues(p, false, KFD_QUEUE_EVICTION_TRIGGER_TTM);
-	// if (!ret) {
-	// 	/* If another thread already signaled the eviction fence,
-	// 	 * they are responsible stopping the queues and scheduling
-	// 	 * the restore work.
-	// 	 */
-	// 	if (signal_eviction_fence(p) ||
-	// 	    mod_delayed_work(kfd_restore_wq, &p->restore_work,
-	// 			     msecs_to_jiffies(PROCESS_RESTORE_TIME_MS)))
-	// 		kfd_process_restore_queues(p);
+	pr_debug("Started evicting pasid 0x%x\n", p->pasid);
+	ret = kfd_process_evict_queues(p, false, KFD_QUEUE_EVICTION_TRIGGER_TTM);
+	if (!ret) {
+		/* If another thread already signaled the eviction fence,
+		 * they are responsible stopping the queues and scheduling
+		 * the restore work.
+		 */
+		if (signal_eviction_fence(p) ||
+		    mod_delayed_work(kfd_restore_wq, &p->restore_work,
+				     msecs_to_jiffies(PROCESS_RESTORE_TIME_MS)))
+			kfd_process_restore_queues(p);
 
-	// 	pr_debug("Finished evicting pasid 0x%x\n", p->pasid);
-	// } else
-	// 	pr_err("Failed to evict queues of pasid 0x%x\n", p->pasid);
-	// trace_kfd_evict_process_worker_end(p, ret ? "Failed" : "Success");
+		pr_debug("Finished evicting pasid 0x%x\n", p->pasid);
+	} else
+		pr_err("Failed to evict queues of pasid 0x%x\n", p->pasid);
+	trace_kfd_evict_process_worker_end(p, ret ? "Failed" : "Success");
 }
 
 static int restore_process_helper(struct kfd_process *p)

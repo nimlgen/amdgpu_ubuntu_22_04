@@ -441,8 +441,8 @@ static void soc21_program_aspm(struct amdgpu_device *adev)
 	if (!amdgpu_device_should_use_aspm(adev))
 		return;
 
-	// if (adev->nbio.funcs->program_aspm)
-	// 	adev->nbio.funcs->program_aspm(adev);
+	if (adev->nbio.funcs->program_aspm)
+		adev->nbio.funcs->program_aspm(adev);
 }
 
 const struct amdgpu_ip_block_version soc21_common_ip_block = {
@@ -767,38 +767,38 @@ static int soc21_common_early_init(void *handle)
 
 static int soc21_common_late_init(void *handle)
 {
-	// struct amdgpu_device *adev = (struct amdgpu_device *)handle;
+	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
-	// if (amdgpu_sriov_vf(adev)) {
-	// 	xgpu_nv_mailbox_get_irq(adev);
-	// 	if ((adev->vcn.harvest_config & AMDGPU_VCN_HARVEST_VCN0) ||
-	// 	!amdgpu_sriov_is_av1_support(adev)) {
-	// 		amdgpu_virt_update_sriov_video_codec(adev,
-	// 						     sriov_vcn_4_0_0_video_codecs_encode_array_vcn1,
-	// 						     ARRAY_SIZE(sriov_vcn_4_0_0_video_codecs_encode_array_vcn1),
-	// 						     sriov_vcn_4_0_0_video_codecs_decode_array_vcn1,
-	// 						     ARRAY_SIZE(sriov_vcn_4_0_0_video_codecs_decode_array_vcn1));
-	// 	} else {
-	// 		amdgpu_virt_update_sriov_video_codec(adev,
-	// 						     sriov_vcn_4_0_0_video_codecs_encode_array_vcn0,
-	// 						     ARRAY_SIZE(sriov_vcn_4_0_0_video_codecs_encode_array_vcn0),
-	// 						     sriov_vcn_4_0_0_video_codecs_decode_array_vcn0,
-	// 						     ARRAY_SIZE(sriov_vcn_4_0_0_video_codecs_decode_array_vcn0));
-	// 	}
-	// } else {
-	// 	if (adev->nbio.ras &&
-	// 	    adev->nbio.ras_err_event_athub_irq.funcs)
-	// 		/* don't need to fail gpu late init
-	// 		 * if enabling athub_err_event interrupt failed
-	// 		 * nbio v4_3 only support fatal error hanlding
-	// 		 * just enable the interrupt directly */
-	// 		amdgpu_irq_get(adev, &adev->nbio.ras_err_event_athub_irq, 0);
-	// }
+	if (amdgpu_sriov_vf(adev)) {
+		xgpu_nv_mailbox_get_irq(adev);
+		if ((adev->vcn.harvest_config & AMDGPU_VCN_HARVEST_VCN0) ||
+		!amdgpu_sriov_is_av1_support(adev)) {
+			amdgpu_virt_update_sriov_video_codec(adev,
+							     sriov_vcn_4_0_0_video_codecs_encode_array_vcn1,
+							     ARRAY_SIZE(sriov_vcn_4_0_0_video_codecs_encode_array_vcn1),
+							     sriov_vcn_4_0_0_video_codecs_decode_array_vcn1,
+							     ARRAY_SIZE(sriov_vcn_4_0_0_video_codecs_decode_array_vcn1));
+		} else {
+			amdgpu_virt_update_sriov_video_codec(adev,
+							     sriov_vcn_4_0_0_video_codecs_encode_array_vcn0,
+							     ARRAY_SIZE(sriov_vcn_4_0_0_video_codecs_encode_array_vcn0),
+							     sriov_vcn_4_0_0_video_codecs_decode_array_vcn0,
+							     ARRAY_SIZE(sriov_vcn_4_0_0_video_codecs_decode_array_vcn0));
+		}
+	} else {
+		if (adev->nbio.ras &&
+		    adev->nbio.ras_err_event_athub_irq.funcs)
+			/* don't need to fail gpu late init
+			 * if enabling athub_err_event interrupt failed
+			 * nbio v4_3 only support fatal error hanlding
+			 * just enable the interrupt directly */
+			amdgpu_irq_get(adev, &adev->nbio.ras_err_event_athub_irq, 0);
+	}
 
-	// /* Enable selfring doorbell aperture late because doorbell BAR
-	//  * aperture will change if resize BAR successfully in gmc sw_init.
-	//  */
-	// adev->nbio.funcs->enable_doorbell_selfring_aperture(adev, true);
+	/* Enable selfring doorbell aperture late because doorbell BAR
+	 * aperture will change if resize BAR successfully in gmc sw_init.
+	 */
+	adev->nbio.funcs->enable_doorbell_selfring_aperture(adev, true);
 
 	return 0;
 }
@@ -823,15 +823,15 @@ static int soc21_common_hw_init(void *handle)
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* enable aspm */
-	// soc21_program_aspm(adev);
+	soc21_program_aspm(adev);
 	/* setup nbio registers */
 	adev->nbio.funcs->init_registers(adev);
 	/* remap HDP registers to a hole in mmio space,
 	 * for the purpose of expose those registers
 	 * to process space
 	 */
-	// if (adev->nbio.funcs->remap_hdp_registers && !amdgpu_sriov_vf(adev))
-	// 	adev->nbio.funcs->remap_hdp_registers(adev);
+	if (adev->nbio.funcs->remap_hdp_registers && !amdgpu_sriov_vf(adev))
+		adev->nbio.funcs->remap_hdp_registers(adev);
 	/* enable the doorbell aperture */
 	adev->nbio.funcs->enable_doorbell_aperture(adev, true);
 
@@ -920,25 +920,23 @@ static int soc21_common_set_clockgating_state(void *handle,
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
-	dev_info(adev->dev, "set_clockgating_state %d\n", state);
-
-	// switch (amdgpu_ip_version(adev, NBIO_HWIP, 0)) {
-	// case IP_VERSION(4, 3, 0):
-	// case IP_VERSION(4, 3, 1):
-	// case IP_VERSION(7, 7, 0):
-	// case IP_VERSION(7, 7, 1):
-	// case IP_VERSION(7, 11, 0):
-	// case IP_VERSION(7, 11, 1):
-	// 	adev->nbio.funcs->update_medium_grain_clock_gating(adev,
-	// 			state == AMD_CG_STATE_GATE);
-	// 	adev->nbio.funcs->update_medium_grain_light_sleep(adev,
-	// 			state == AMD_CG_STATE_GATE);
-	// 	adev->hdp.funcs->update_clock_gating(adev,
-	// 			state == AMD_CG_STATE_GATE);
-	// 	break;
-	// default:
-	// 	break;
-	// }
+	switch (amdgpu_ip_version(adev, NBIO_HWIP, 0)) {
+	case IP_VERSION(4, 3, 0):
+	case IP_VERSION(4, 3, 1):
+	case IP_VERSION(7, 7, 0):
+	case IP_VERSION(7, 7, 1):
+	case IP_VERSION(7, 11, 0):
+	case IP_VERSION(7, 11, 1):
+		adev->nbio.funcs->update_medium_grain_clock_gating(adev,
+				state == AMD_CG_STATE_GATE);
+		adev->nbio.funcs->update_medium_grain_light_sleep(adev,
+				state == AMD_CG_STATE_GATE);
+		adev->hdp.funcs->update_clock_gating(adev,
+				state == AMD_CG_STATE_GATE);
+		break;
+	default:
+		break;
+	}
 	return 0;
 }
 
@@ -947,17 +945,15 @@ static int soc21_common_set_powergating_state(void *handle,
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
-	dev_info(adev->dev, "soc21_common_set_powergating_state %d\n", state);
-
-	// switch (amdgpu_ip_version(adev, LSDMA_HWIP, 0)) {
-	// case IP_VERSION(6, 0, 0):
-	// case IP_VERSION(6, 0, 2):
-	// 	adev->lsdma.funcs->update_memory_power_gating(adev,
-	// 			state == AMD_PG_STATE_GATE);
-	// 	break;
-	// default:
-	// 	break;
-	// }
+	switch (amdgpu_ip_version(adev, LSDMA_HWIP, 0)) {
+	case IP_VERSION(6, 0, 0):
+	case IP_VERSION(6, 0, 2):
+		adev->lsdma.funcs->update_memory_power_gating(adev,
+				state == AMD_PG_STATE_GATE);
+		break;
+	default:
+		break;
+	}
 
 	return 0;
 }
@@ -965,8 +961,6 @@ static int soc21_common_set_powergating_state(void *handle,
 static void soc21_common_get_clockgating_state(void *handle, u64 *flags)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
-
-	dev_info(adev->dev, "soc21_common_get_clockgating_state\n");
 
 	adev->nbio.funcs->get_clockgating_state(adev, flags);
 
