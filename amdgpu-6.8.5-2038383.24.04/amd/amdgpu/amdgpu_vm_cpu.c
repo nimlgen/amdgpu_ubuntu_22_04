@@ -92,6 +92,8 @@ static int amdgpu_vm_cpu_update(struct amdgpu_vm_update_params *p,
 			addr;
 		amdgpu_gmc_set_pte_pde(p->adev, (void *)(uintptr_t)pe,
 				       i, value, flags);
+		// dev_info(p->adev->dev, "vm update: %p 0x%llx 0x%llx 0x%llx\n",
+		// 	 (void *)(uintptr_t)pe, i, value, flags);
 		addr += incr;
 	}
 	return 0;

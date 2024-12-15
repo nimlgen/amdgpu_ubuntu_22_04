@@ -166,6 +166,8 @@ static int pp_hw_init(void *handle)
 	struct amdgpu_device *adev = handle;
 	struct pp_hwmgr *hwmgr = adev->powerplay.pp_handle;
 
+	dev_info(adev->dev, "powerplay: INIT\n");
+
 	ret = hwmgr_hw_init(hwmgr);
 
 	if (ret)

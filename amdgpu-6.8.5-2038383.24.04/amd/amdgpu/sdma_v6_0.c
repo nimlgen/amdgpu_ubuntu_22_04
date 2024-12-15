@@ -758,6 +758,9 @@ static int sdma_v6_0_start(struct amdgpu_device *adev)
 			msleep(1000);
 	}
 
+	extern int _reg_logs;
+	_reg_logs = 0;
+
 	/* unhalt the MEs */
 	sdma_v6_0_enable(adev, true);
 	/* enable sdma ring preemption */
@@ -768,6 +771,8 @@ static int sdma_v6_0_start(struct amdgpu_device *adev)
 	if (r)
 		return r;
 	r = sdma_v6_0_rlc_resume(adev);
+
+	_reg_logs = 0;
 
 	return r;
 }

@@ -34,6 +34,8 @@ void _kcl_pci_configure_extended_tags(struct pci_dev *dev)
 	u16 ctl;
 	int ret;
 
+	dev_info(&dev->dev, "in _kcl_pci_configure_extended_tags %d.\n", pci_is_pcie(dev));
+
 	if (!pci_is_pcie(dev))
 		return;
 

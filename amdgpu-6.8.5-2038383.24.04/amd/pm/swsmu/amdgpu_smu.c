@@ -735,6 +735,8 @@ static int smu_early_init(void *handle)
 	struct smu_context *smu;
 	int r;
 
+	dev_info(adev->dev, "SMU smu_early_init!\n");
+
 	smu = kzalloc(sizeof(struct smu_context), GFP_KERNEL);
 	if (!smu)
 		return -ENOMEM;
@@ -1228,6 +1230,8 @@ static int smu_sw_init(void *handle)
 	struct smu_context *smu = adev->powerplay.pp_handle;
 	int ret;
 
+	dev_info(adev->dev, "SMU smu_sw_init!\n");
+
 	smu->pool_size = adev->pm.smu_prv_buffer_size;
 	smu->smu_feature.feature_num = SMU_FEATURE_MAX;
 	bitmap_zero(smu->smu_feature.supported, SMU_FEATURE_MAX);
@@ -1534,6 +1538,8 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 	uint64_t features_supported;
 	int ret = 0;
 
+	dev_info(adev->dev, "in smu_smc_hw_setup!\n");
+
 	switch (amdgpu_ip_version(adev, MP1_HWIP, 0)) {
 	case IP_VERSION(11, 0, 7):
 	case IP_VERSION(11, 0, 11):
@@ -1551,17 +1557,23 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		break;
 	}
 
+	dev_info(adev->dev, "will smu_init_display_count!\n");
+
 	ret = smu_init_display_count(smu, 0);
 	if (ret) {
 		dev_info(adev->dev, "Failed to pre-set display count as 0!\n");
 		return ret;
 	}
 
+	dev_info(adev->dev, "will smu_set_driver_table_location!\n");
+
 	ret = smu_set_driver_table_location(smu);
 	if (ret) {
 		dev_err(adev->dev, "Failed to SetDriverDramAddr!\n");
 		return ret;
 	}
+
+	// dev_info(adev->dev, "will smu_set_tool_table_location!\n");
 
 	/*
 	 * Set PMSTATUSLOG table bo address with SetToolsDramAddr MSG for tools.
@@ -1572,6 +1584,8 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		return ret;
 	}
 
+	// dev_info(adev->dev, "will smu_notify_memory_pool_location!\n");
+
 	/*
 	 * Use msg SetSystemVirtualDramAddr and DramLogSetDramAddr can notify
 	 * pool location.
@@ -1581,6 +1595,8 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		dev_err(adev->dev, "Failed to SetDramLogDramAddr!\n");
 		return ret;
 	}
+
+	// dev_info(adev->dev, "will smu_setup_pptable!\n");
 
 	/*
 	 * It is assumed the pptable used before runpm is same as
@@ -1602,6 +1618,7 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 	 * (to SMU). Driver involvement is not needed and permitted.
 	 */
 	if (!adev->scpm_enabled) {
+		dev_info(adev->dev, "will smu_write_pptable!\n");
 		/*
 		 * Copy pptable bo in the vram to smc with SMU MSGs such as
 		 * SetDriverDramAddr and TransferTableDram2Smu.
@@ -1613,6 +1630,8 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		}
 	}
 
+	// dev_info(adev->dev, "will smu_run_btc!\n");
+
 	/* issue Run*Btc msg */
 	ret = smu_run_btc(smu);
 	if (ret)
@@ -1620,6 +1639,8 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 
 	/* Enable UclkShadow on wbrf supported */
 	if (smu->wbrf_supported) {
+		dev_info(adev->dev, "will smu_enable_uclk_shadow!\n");
+
 		ret = smu_enable_uclk_shadow(smu, true);
 		if (ret) {
 			dev_err(adev->dev, "Failed to enable UclkShadow feature to support wbrf!\n");
@@ -1632,6 +1653,8 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 	 * not needed and permitted.
 	 */
 	if (!adev->scpm_enabled) {
+		dev_info(adev->dev, "will smu_feature_set_allowed_mask!\n");
+
 		ret = smu_feature_set_allowed_mask(smu);
 		if (ret) {
 			dev_err(adev->dev, "Failed to set driver allowed features mask!\n");
@@ -1639,14 +1662,17 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		}
 	}
 
+	dev_info(adev->dev, "will smu_system_features_control!\n");
 	ret = smu_system_features_control(smu, true);
 	if (ret) {
 		dev_err(adev->dev, "Failed to enable requested dpm features!\n");
 		return ret;
 	}
 
+	dev_info(adev->dev, "will smu_init_xgmi_plpd_mode!\n");
 	smu_init_xgmi_plpd_mode(smu);
 
+	dev_info(adev->dev, "will smu_feature_get_enabled_mask!\n");
 	ret = smu_feature_get_enabled_mask(smu, &features_supported);
 	if (ret) {
 		dev_err(adev->dev, "Failed to retrieve supported dpm features!\n");
@@ -1664,6 +1690,7 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 	 * gfxclk, memclk, dcefclk, and etc. And enable the DPM feature for each
 	 * type of clks.
 	 */
+	dev_info(adev->dev, "will smu_set_default_dpm_table!\n");
 	ret = smu_set_default_dpm_table(smu);
 	if (ret) {
 		dev_err(adev->dev, "Failed to setup default dpm clock tables!\n");
@@ -1701,18 +1728,21 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		return ret;
 	}
 
+	dev_info(adev->dev, "will smu_get_thermal_temperature_range!\n");
 	ret = smu_get_thermal_temperature_range(smu);
 	if (ret) {
 		dev_err(adev->dev, "Failed to get thermal temperature ranges!\n");
 		return ret;
 	}
 
+	dev_info(adev->dev, "will smu_enable_thermal_alert!\n");
 	ret = smu_enable_thermal_alert(smu);
 	if (ret) {
 	  dev_err(adev->dev, "Failed to enable thermal alert!\n");
 	  return ret;
 	}
 
+	dev_info(adev->dev, "will smu_notify_display_change!\n");
 	ret = smu_notify_display_change(smu);
 	if (ret) {
 		dev_err(adev->dev, "Failed to notify display change!\n");
@@ -1723,6 +1753,7 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 	 * Set min deep sleep dce fclk with bootup value from vbios via
 	 * SetMinDeepSleepDcefclk MSG.
 	 */
+	dev_info(adev->dev, "will smu_set_min_dcef_deep_sleep!\n");
 	ret = smu_set_min_dcef_deep_sleep(smu,
 					  smu->smu_table.boot_values.dcefclk / 100);
 	if (ret) {
@@ -1734,6 +1765,36 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 	ret = smu_wbrf_init(smu);
 	if (ret)
 		dev_err(adev->dev, "Error during wbrf init call\n");
+
+	// [0x00000C94, 0x000204E1, 0x000105DC, 0x00050B76, 0x00070B76, 0x00040898, 0x00060898, 0x000308FD]
+	extern int smu_cmn_send_smc_msg_with_param(struct smu_context *smu,
+				    enum smu_message_type msg,
+				    uint32_t param,
+				    uint32_t *read_arg);
+
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMinByFreq, 0x00000C94, NULL);
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMaxByFreq, 0x00000C94, NULL);
+
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMinByFreq, 0x000204E1, NULL);
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMaxByFreq, 0x000204E1, NULL);
+
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMinByFreq, 0x000105DC, NULL);
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMaxByFreq, 0x000105DC, NULL);
+
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMinByFreq, 0x00050B76, NULL);
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMaxByFreq, 0x00050B76, NULL);
+
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMinByFreq, 0x00070B76, NULL);
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMaxByFreq, 0x00070B76, NULL);
+
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMinByFreq, 0x00040898, NULL);
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMaxByFreq, 0x00040898, NULL);
+
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMinByFreq, 0x00060898, NULL);
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMaxByFreq, 0x00060898, NULL);
+
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMinByFreq, 0x000308FD, NULL);
+	smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetSoftMaxByFreq, 0x000308FD, NULL);
 
 	return ret;
 }
@@ -1783,29 +1844,33 @@ static int smu_hw_init(void *handle)
 		return 0;
 	}
 
+	dev_info(adev->dev, "SMU is initializing...\n");
+
 	ret = smu_start_smc_engine(smu);
 	if (ret) {
 		dev_err(adev->dev, "SMC engine is not correctly up!\n");
 		return ret;
 	}
 
+	dev_info(adev->dev, "SMU smu_start_smc_engine done...\n");
+
 	/*
 	 * Check whether wbrf is supported. This needs to be done
 	 * before SMU setup starts since part of SMU configuration
 	 * relies on this.
 	 */
-	smu_wbrf_support_check(smu);
+	// smu_wbrf_support_check(smu);
 
-	if (smu->is_apu) {
-		ret = smu_set_gfx_imu_enable(smu);
-		if (ret)
-			return ret;
-		smu_dpm_set_vcn_enable(smu, true);
-		smu_dpm_set_jpeg_enable(smu, true);
-		smu_dpm_set_vpe_enable(smu, true);
-		smu_dpm_set_umsch_mm_enable(smu, true);
-		smu_set_gfx_cgpg(smu, true);
-	}
+	// if (smu->is_apu) {
+	// 	ret = smu_set_gfx_imu_enable(smu);
+	// 	if (ret)
+	// 		return ret;
+	// 	smu_dpm_set_vcn_enable(smu, true);
+	// 	smu_dpm_set_jpeg_enable(smu, true);
+	// 	smu_dpm_set_vpe_enable(smu, true);
+	// 	smu_dpm_set_umsch_mm_enable(smu, true);
+	// 	smu_set_gfx_cgpg(smu, true);
+	// }
 
 	if (!smu->pm_enabled)
 		return 0;
@@ -1814,11 +1879,15 @@ static int smu_hw_init(void *handle)
 	if (ret)
 		return ret;
 
+	dev_info(adev->dev, "SMU smu_get_driver_allowed_feature_mask done...\n");
+
 	ret = smu_smc_hw_setup(smu);
 	if (ret) {
 		dev_err(adev->dev, "Failed to setup smc hw!\n");
 		return ret;
 	}
+
+	dev_info(adev->dev, "SMU smu_smc_hw_setup done...\n");
 
 	/*
 	 * Move maximum sustainable clock retrieving here considering
@@ -1832,6 +1901,8 @@ static int smu_hw_init(void *handle)
 		dev_err(adev->dev, "Failed to init max sustainable clocks!\n");
 		return ret;
 	}
+
+	dev_info(adev->dev, "SMU smu_init_max_sustainable_clocks done...\n");
 
 	adev->pm.dpm_enabled = true;
 
@@ -2776,12 +2847,12 @@ static int smu_set_power_limit(void *handle, uint32_t limit)
 		if (smu->ppt_funcs->set_power_limit)
 			return smu->ppt_funcs->set_power_limit(smu, limit_type, limit);
 
-	if ((limit > smu->max_power_limit) || (limit < smu->min_power_limit)) {
-		dev_err(smu->adev->dev,
-			"New power limit (%d) is out of range [%d,%d]\n",
-			limit, smu->min_power_limit, smu->max_power_limit);
-		return -EINVAL;
-	}
+	// if ((limit > smu->max_power_limit) || (limit < smu->min_power_limit)) {
+	// 	dev_err(smu->adev->dev,
+	// 		"New power limit (%d) is out of range [%d,%d]\n",
+	// 		limit, smu->min_power_limit, smu->max_power_limit);
+	// 	return -EINVAL;
+	// }
 
 	if (!limit)
 		limit = smu->current_power_limit;

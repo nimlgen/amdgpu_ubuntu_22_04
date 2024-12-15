@@ -461,7 +461,7 @@ static int si_dma_early_init(void *handle)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
-	adev->sdma.num_instances = 2;
+	adev->sdma.num_instances = 0;
 
 	si_dma_set_ring_funcs(adev);
 	si_dma_set_buffer_funcs(adev);

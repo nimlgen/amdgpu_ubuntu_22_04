@@ -250,6 +250,8 @@ int amdgpu_sdma_init_microcode(struct amdgpu_device *adev,
 		  adev->firmware.load_type == AMDGPU_FW_LOAD_PSP ? "true" : "false");
 
 	if (adev->firmware.load_type == AMDGPU_FW_LOAD_PSP) {
+		dev_info(adev->dev, "PSP load SDMA firmware %d\n", version_major);
+
 		switch (version_major) {
 		case 1:
 			for (i = 0; i < adev->sdma.num_instances; i++) {

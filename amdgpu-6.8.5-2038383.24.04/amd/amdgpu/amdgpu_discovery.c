@@ -289,6 +289,7 @@ static int amdgpu_discovery_read_binary_from_mem(struct amdgpu_device *adev,
 		uint64_t pos = vram_size - DISCOVERY_TMR_OFFSET;
 		amdgpu_device_vram_access(adev, pos, (uint32_t *)binary,
 					  adev->mman.discovery_tmr_size, false);
+		dev_info(adev->dev, "use ip discovery information from VRAM\n");
 #ifdef HAVE_ACPI_DEV_GET_FIRST_MATCH_DEV
 	} else {
 		ret = amdgpu_discovery_read_binary_from_sysmem(adev, binary);
@@ -1309,6 +1310,8 @@ static int amdgpu_discovery_reg_base_init(struct amdgpu_device *adev)
 		return r;
 	}
 
+	dev_info(adev->dev, "IN IP discovery\n");
+
 	adev->gfx.xcc_mask = 0;
 	adev->sdma.sdma_mask = 0;
 	adev->vcn.inst_mask = 0;
@@ -1336,6 +1339,7 @@ static int amdgpu_discovery_reg_base_init(struct amdgpu_device *adev)
 				le16_to_cpu(dhdr->die_id), num_ips);
 
 		for (j = 0; j < num_ips; j++) {
+			dev_info(adev->dev, "IP offset: %d\n", ip_offset);
 			ip = (struct ip_v4 *)(adev->mman.discovery_bin + ip_offset);
 
 			if (amdgpu_discovery_validate_ip(ip))
@@ -1436,6 +1440,7 @@ static int amdgpu_discovery_reg_base_init(struct amdgpu_device *adev)
 							hw_id_names[le16_to_cpu(ip->hw_id)]);
 					adev->reg_offset[hw_ip][ip->instance_number] =
 						ip->base_address;
+					// dev_info(adev->dev, "set ip instance %d : %d\n", hw_ip, ip->instance_number);
 					/* Instance support is somewhat inconsistent.
 					 * SDMA is a good example.  Sienna cichlid has 4 total
 					 * SDMA instances, each enumerated separately (HWIDs
@@ -2345,7 +2350,7 @@ static int amdgpu_discovery_set_mes_ip_blocks(struct amdgpu_device *adev)
 	case IP_VERSION(11, 0, 4):
 	case IP_VERSION(11, 5, 0):
 	case IP_VERSION(11, 5, 1):
-		amdgpu_device_ip_block_add(adev, &mes_v11_0_ip_block);
+		// amdgpu_device_ip_block_add(adev, &mes_v11_0_ip_block);
 		adev->enable_mes = true;
 		adev->enable_mes_kiq = true;
 		break;
@@ -2431,7 +2436,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 	switch (adev->asic_type) {
 	case CHIP_VEGA10:
 		vega10_reg_base_init(adev);
-		adev->sdma.num_instances = 2;
+		adev->sdma.num_instances = 0;
 		adev->gmc.num_umc = 4;
 		adev->ip_versions[MMHUB_HWIP][0] = IP_VERSION(9, 0, 0);
 		adev->ip_versions[ATHUB_HWIP][0] = IP_VERSION(9, 0, 0);
@@ -2453,7 +2458,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 		break;
 	case CHIP_VEGA12:
 		vega10_reg_base_init(adev);
-		adev->sdma.num_instances = 2;
+		adev->sdma.num_instances = 0;
 		adev->gmc.num_umc = 4;
 		adev->ip_versions[MMHUB_HWIP][0] = IP_VERSION(9, 3, 0);
 		adev->ip_versions[ATHUB_HWIP][0] = IP_VERSION(9, 3, 0);
@@ -2475,7 +2480,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 		break;
 	case CHIP_RAVEN:
 		vega10_reg_base_init(adev);
-		adev->sdma.num_instances = 1;
+		adev->sdma.num_instances = 0;
 		adev->vcn.num_vcn_inst = 1;
 		adev->gmc.num_umc = 2;
 		if (adev->apu_flags & AMD_APU_IS_RAVEN2) {
@@ -2514,7 +2519,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 		break;
 	case CHIP_VEGA20:
 		vega20_reg_base_init(adev);
-		adev->sdma.num_instances = 2;
+		adev->sdma.num_instances = 0;
 		adev->gmc.num_umc = 8;
 		adev->ip_versions[MMHUB_HWIP][0] = IP_VERSION(9, 4, 0);
 		adev->ip_versions[ATHUB_HWIP][0] = IP_VERSION(9, 4, 0);
@@ -2537,7 +2542,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 		break;
 	case CHIP_ARCTURUS:
 		arct_reg_base_init(adev);
-		adev->sdma.num_instances = 8;
+		adev->sdma.num_instances = 0;
 		adev->vcn.num_vcn_inst = 2;
 		adev->gmc.num_umc = 8;
 		adev->ip_versions[MMHUB_HWIP][0] = IP_VERSION(9, 4, 1);
@@ -2565,7 +2570,7 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 		break;
 	case CHIP_ALDEBARAN:
 		aldebaran_reg_base_init(adev);
-		adev->sdma.num_instances = 5;
+		adev->sdma.num_instances = 0;
 		adev->vcn.num_vcn_inst = 2;
 		adev->gmc.num_umc = 4;
 		adev->ip_versions[MMHUB_HWIP][0] = IP_VERSION(9, 4, 2);
@@ -2914,9 +2919,9 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 			return r;
 	}
 
-	r = amdgpu_discovery_set_display_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_display_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 
 	r = amdgpu_discovery_set_gc_ip_blocks(adev);
 	if (r)
@@ -2934,25 +2939,25 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 			return r;
 	}
 
-	r = amdgpu_discovery_set_mm_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_mm_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 
 	r = amdgpu_discovery_set_mes_ip_blocks(adev);
 	if (r)
 		return r;
 
-	r = amdgpu_discovery_set_vpe_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_vpe_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 
-	r = amdgpu_discovery_set_umsch_mm_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_umsch_mm_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 
-	r = amdgpu_discovery_set_isp_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_isp_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 	return 0;
 }
 

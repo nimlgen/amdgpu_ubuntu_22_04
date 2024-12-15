@@ -1547,29 +1547,30 @@ int amdgpu_mes_init_microcode(struct amdgpu_device *adev, int pipe)
 		((uint64_t)(le32_to_cpu(mes_hdr->mes_data_start_addr_hi)) << 32);
 
 	if (adev->firmware.load_type == AMDGPU_FW_LOAD_PSP) {
-		int ucode, ucode_data;
+		dev_info(adev->dev, "MES ucode skip load\n");
+		// int ucode, ucode_data;
 
-		if (pipe == AMDGPU_MES_SCHED_PIPE) {
-			ucode = AMDGPU_UCODE_ID_CP_MES;
-			ucode_data = AMDGPU_UCODE_ID_CP_MES_DATA;
-		} else {
-			ucode = AMDGPU_UCODE_ID_CP_MES1;
-			ucode_data = AMDGPU_UCODE_ID_CP_MES1_DATA;
-		}
+		// if (pipe == AMDGPU_MES_SCHED_PIPE) {
+		// 	ucode = AMDGPU_UCODE_ID_CP_MES;
+		// 	ucode_data = AMDGPU_UCODE_ID_CP_MES_DATA;
+		// } else {
+		// 	ucode = AMDGPU_UCODE_ID_CP_MES1;
+		// 	ucode_data = AMDGPU_UCODE_ID_CP_MES1_DATA;
+		// }
 
-		info = &adev->firmware.ucode[ucode];
-		info->ucode_id = ucode;
-		info->fw = adev->mes.fw[pipe];
-		adev->firmware.fw_size +=
-			ALIGN(le32_to_cpu(mes_hdr->mes_ucode_size_bytes),
-			      PAGE_SIZE);
+		// info = &adev->firmware.ucode[ucode];
+		// info->ucode_id = ucode;
+		// info->fw = adev->mes.fw[pipe];
+		// adev->firmware.fw_size +=
+		// 	ALIGN(le32_to_cpu(mes_hdr->mes_ucode_size_bytes),
+		// 	      PAGE_SIZE);
 
-		info = &adev->firmware.ucode[ucode_data];
-		info->ucode_id = ucode_data;
-		info->fw = adev->mes.fw[pipe];
-		adev->firmware.fw_size +=
-			ALIGN(le32_to_cpu(mes_hdr->mes_ucode_data_size_bytes),
-			      PAGE_SIZE);
+		// info = &adev->firmware.ucode[ucode_data];
+		// info->ucode_id = ucode_data;
+		// info->fw = adev->mes.fw[pipe];
+		// adev->firmware.fw_size +=
+		// 	ALIGN(le32_to_cpu(mes_hdr->mes_ucode_data_size_bytes),
+		// 	      PAGE_SIZE);
 	}
 
 	return 0;

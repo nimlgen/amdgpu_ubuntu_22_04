@@ -229,6 +229,8 @@ static int psp_v13_0_bootloader_load_component(struct psp_context  	*psp,
 	if (psp_v13_0_is_sos_alive(psp))
 		return 0;
 
+	dev_info(adev->dev, "psp_v13_0_bootloader_load_component %d\n", bl_cmd);
+
 	ret = psp_v13_0_wait_for_bootloader(psp);
 	if (ret)
 		return ret;
@@ -237,6 +239,14 @@ static int psp_v13_0_bootloader_load_component(struct psp_context  	*psp,
 
 	/* Copy PSP KDB binary to memory */
 	memcpy(psp->fw_pri_buf, bin_desc->start_addr, bin_desc->size_bytes);
+
+	uint32_t checksum = 0;
+	for (int i = 0; i < bin_desc->size_bytes; i++) {
+		checksum += bin_desc->start_addr[i];
+		checksum %= (((int)(1e9)) + 7);
+	}
+
+	dev_info(adev->dev, "\tchecksum: %d\n", checksum);
 
 	/* Provide the PSP KDB to bootloader */
 	WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_36,

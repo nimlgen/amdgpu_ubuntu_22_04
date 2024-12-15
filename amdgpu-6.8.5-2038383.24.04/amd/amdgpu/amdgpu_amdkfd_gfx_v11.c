@@ -58,6 +58,8 @@ static void acquire_queue(struct amdgpu_device *adev, uint32_t pipe_id,
 	uint32_t mec = (pipe_id / adev->gfx.mec.num_pipe_per_mec) + 1;
 	uint32_t pipe = (pipe_id % adev->gfx.mec.num_pipe_per_mec);
 
+	dev_info(adev->dev, "acquiring queue %d, pipe %d, mec %d\n",
+			queue_id, pipe_id, mec);
 	lock_srbm(adev, mec, pipe, queue_id, 0);
 }
 
@@ -72,6 +74,7 @@ static uint64_t get_queue_mask(struct amdgpu_device *adev,
 
 static void release_queue(struct amdgpu_device *adev)
 {
+	dev_info(adev->dev, "releasing queue\n");
 	unlock_srbm(adev);
 }
 
@@ -83,8 +86,11 @@ static void program_sh_mem_settings_v11(struct amdgpu_device *adev, uint32_t vmi
 {
 	lock_srbm(adev, 0, 0, 0, vmid);
 
+	dev_info(adev->dev, "programming sh_mem_settings for vmid %d\n", vmid);
 	WREG32(SOC15_REG_OFFSET(GC, 0, regSH_MEM_CONFIG), sh_mem_config);
 	WREG32(SOC15_REG_OFFSET(GC, 0, regSH_MEM_BASES), sh_mem_bases);
+
+	dev_info(adev->dev, "programming sh_mem val: 0x%x, 0x%x\n", sh_mem_config, sh_mem_bases);
 
 	unlock_srbm(adev);
 }
@@ -94,10 +100,20 @@ static int set_pasid_vmid_mapping_v11(struct amdgpu_device *adev, unsigned int p
 {
 	uint32_t value = pasid << IH_VMID_0_LUT__PASID__SHIFT;
 
+	extern int _reg_logs;
+	if (vmid == 8) {
+		if (pasid != 0) {
+			_reg_logs = 0; // 1
+		} else {
+			_reg_logs = 0;
+			dev_info(adev->dev, "no logs\n");
+		}
+	}
+
 	/* Mapping vmid to pasid also for IH block */
-	pr_debug("mapping vmid %d -> pasid %d in IH block for GFX client\n",
+	dev_info(adev->dev, "mapping vmid %d -> pasid %d in IH block for GFX client\n",
 			vmid, pasid);
-	WREG32(SOC15_REG_OFFSET(OSSSYS, 0, regIH_VMID_0_LUT) + vmid, value);
+	// WREG32(SOC15_REG_OFFSET(OSSSYS, 0, regIH_VMID_0_LUT) + vmid, value);
 
 	return 0;
 }
@@ -113,9 +129,9 @@ static int init_interrupts_v11(struct amdgpu_device *adev, uint32_t pipe_id,
 
 	lock_srbm(adev, mec, pipe, 0, 0);
 
-	WREG32_SOC15(GC, 0, regCPC_INT_CNTL,
-		CP_INT_CNTL_RING0__TIME_STAMP_INT_ENABLE_MASK |
-		CP_INT_CNTL_RING0__OPCODE_ERROR_INT_ENABLE_MASK);
+	// WREG32_SOC15(GC, 0, regCPC_INT_CNTL,
+	// 	CP_INT_CNTL_RING0__TIME_STAMP_INT_ENABLE_MASK |
+	// 	CP_INT_CNTL_RING0__OPCODE_ERROR_INT_ENABLE_MASK);
 
 	unlock_srbm(adev);
 
@@ -172,6 +188,8 @@ static int hqd_load_v11(struct amdgpu_device *adev, void *mqd, uint32_t pipe_id,
 
 	m = get_mqd(mqd);
 
+	dev_info(adev->dev, "Load hqd of pipe %d queue %d\n", pipe_id, queue_id);
+
 	pr_debug("Load hqd of pipe %d queue %d\n", pipe_id, queue_id);
 	acquire_queue(adev, pipe_id, queue_id);
 
@@ -195,16 +213,17 @@ static int hqd_load_v11(struct amdgpu_device *adev, void *mqd, uint32_t pipe_id,
 	hqd_base = SOC15_REG_OFFSET(GC, 0, regCP_MQD_BASE_ADDR);
 
 	for (reg = hqd_base;
-	     reg <= SOC15_REG_OFFSET(GC, 0, regCP_HQD_PQ_WPTR_HI); reg++)
+	     reg <= SOC15_REG_OFFSET(GC, 0, regCP_HQD_PQ_WPTR_HI); reg++) {
+		// dev_info(adev->dev, "Loading hqd reg %x %x\n", reg, mqd_hqd[reg - hqd_base]);
 		WREG32(reg, mqd_hqd[reg - hqd_base]);
-
+	}
 
 	/* Activate doorbell logic before triggering WPTR poll. */
 	data = REG_SET_FIELD(m->cp_hqd_pq_doorbell_control,
 			     CP_HQD_PQ_DOORBELL_CONTROL, DOORBELL_EN, 1);
 	WREG32(SOC15_REG_OFFSET(GC, 0, regCP_HQD_PQ_DOORBELL_CONTROL), data);
 
-	if (wptr) {
+	if (wptr && false) {
 		/* Don't read wptr with get_user because the user
 		 * context may not be accessible (if this function
 		 * runs in a work queue). Instead trigger a one-shot
@@ -246,9 +265,9 @@ static int hqd_load_v11(struct amdgpu_device *adev, void *mqd, uint32_t pipe_id,
 	}
 
 	/* Start the EOP fetcher */
-	WREG32(SOC15_REG_OFFSET(GC, 0, regCP_HQD_EOP_RPTR),
-	       REG_SET_FIELD(m->cp_hqd_eop_rptr,
-			     CP_HQD_EOP_RPTR, INIT_FETCHER, 1));
+	// WREG32(SOC15_REG_OFFSET(GC, 0, regCP_HQD_EOP_RPTR),
+	//        REG_SET_FIELD(m->cp_hqd_eop_rptr,
+	// 		     CP_HQD_EOP_RPTR, INIT_FETCHER, 1));
 
 	data = REG_SET_FIELD(m->cp_hqd_active, CP_HQD_ACTIVE, ACTIVE, 1);
 	WREG32(SOC15_REG_OFFSET(GC, 0, regCP_HQD_ACTIVE), data);
@@ -274,6 +293,8 @@ static int hiq_mqd_load_v11(struct amdgpu_device *adev, void *mqd,
 	mec = (pipe_id / adev->gfx.mec.num_pipe_per_mec) + 1;
 	pipe = (pipe_id % adev->gfx.mec.num_pipe_per_mec);
 
+	dev_info(adev->dev, "Load HIQ of pipe %d queue %d\n", pipe_id, queue_id);
+	
 	pr_debug("kfd: set HIQ, mec:%d, pipe:%d, queue:%d.\n",
 		 mec, pipe, queue_id);
 
@@ -579,6 +600,8 @@ static int wave_control_execute_v11(struct amdgpu_device *adev,
 
 	mutex_lock(&adev->grbm_idx_mutex);
 
+	dev_info(adev->dev, "wave control execute\n");
+
 	WREG32(SOC15_REG_OFFSET(GC, 0, regGRBM_GFX_INDEX), gfx_index_val);
 	WREG32(SOC15_REG_OFFSET(GC, 0, regSQ_CMD), sq_cmd);
 
@@ -603,6 +626,8 @@ static void set_vm_context_page_table_base_v11(struct amdgpu_device *adev,
 		       vmid);
 		return;
 	}
+
+	dev_info(adev->dev, "setting page table base for vmid %d\n", vmid);
 
 	/* SDMA is on gfxhub as well for gfx11 adapters */
 	adev->gfxhub.funcs->setup_vm_pt_regs(adev, vmid, page_table_base);
@@ -684,6 +709,8 @@ static uint32_t trap_mask_map_sw_to_hw(uint32_t mask)
 			KFD_DBG_TRAP_MASK_DBG_MEMORY_VIOLATION);
 	uint32_t ret;
 
+	// dev_info(adev->dev, "trap_mask_map_sw_to_hw: mask 0x%x\n", mask);
+	
 	ret = REG_SET_FIELD(0, SPI_GDBG_PER_VMID_CNTL, EXCP_EN, excp_en);
 	ret = REG_SET_FIELD(ret, SPI_GDBG_PER_VMID_CNTL, TRAP_ON_START, trap_on_start);
 	ret = REG_SET_FIELD(ret, SPI_GDBG_PER_VMID_CNTL, TRAP_ON_END, trap_on_end);
@@ -732,6 +759,7 @@ static uint32_t kgd_gfx_v11_set_wave_launch_mode(struct amdgpu_device *adev,
 {
 	uint32_t data = 0;
 
+	dev_info(adev->dev, "setting wave launch mode for vmid %d\n", vmid);
 	data = REG_SET_FIELD(data, SPI_GDBG_PER_VMID_CNTL, LAUNCH_MODE, wave_launch_mode);
 
 	return data;
@@ -749,6 +777,8 @@ static uint32_t kgd_gfx_v11_set_address_watch(struct amdgpu_device *adev,
 	uint32_t watch_address_high;
 	uint32_t watch_address_low;
 	uint32_t watch_address_cntl;
+
+	dev_info(adev->dev, "setting address watch for watch_id %d\n", watch_id);
 
 	watch_address_cntl = 0;
 	watch_address_low = lower_32_bits(watch_address);

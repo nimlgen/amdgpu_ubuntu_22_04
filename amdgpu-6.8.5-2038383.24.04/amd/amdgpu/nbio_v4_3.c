@@ -154,6 +154,9 @@ static void nbio_v4_3_enable_doorbell_aperture(struct amdgpu_device *adev,
 {
 	WREG32_FIELD15_PREREG(NBIO, 0, RCC_DEV0_EPF0_RCC_DOORBELL_APER_EN,
 			BIF_DOORBELL_APER_EN, enable ? 1 : 0);
+
+	uint32_t cc = RREG32_SOC15(NBIO, 0, regRCC_DEV0_EPF0_RCC_DOORBELL_APER_EN);
+	dev_info(adev->dev, "RCC_DEV0_EPF0_RCC_DOORBELL_APER_EN: 0x%08X\n", cc);
 }
 
 static void nbio_v4_3_enable_doorbell_selfring_aperture(struct amdgpu_device *adev,
@@ -344,6 +347,7 @@ static void nbio_v4_3_init_registers(struct amdgpu_device *adev)
 		data = RREG32_SOC15(NBIO, 0, regRCC_DEV0_EPF2_STRAP2);
 		data &= ~RCC_DEV0_EPF2_STRAP2__STRAP_NO_SOFT_RESET_DEV0_F2_MASK;
 		WREG32_SOC15(NBIO, 0, regRCC_DEV0_EPF2_STRAP2, data);
+		dev_info(adev->dev, "regRCC_DEV0_EPF2_STRAP2 = 0x%08X\n", data);
 	}
 }
 

@@ -157,7 +157,7 @@ int amdgpu_vm_size = -1;
 int amdgpu_vm_fragment_size = -1;
 int amdgpu_vm_block_size = -1;
 int amdgpu_vm_fault_stop;
-int amdgpu_vm_update_mode = -1;
+int amdgpu_vm_update_mode = 3;
 int amdgpu_exp_hw_support;
 int amdgpu_dc = -1;
 int amdgpu_sched_jobs = 32;
@@ -742,7 +742,7 @@ module_param_named(use_xgmi_p2p, amdgpu_use_xgmi_p2p, int, 0444);
  * Setting 1 disables over-subscription. Setting 2 disables HWS and statically
  * assigns queues to HQDs.
  */
-int sched_policy = KFD_SCHED_POLICY_HWS;
+int sched_policy = 2;
 module_param(sched_policy, int, 0444);
 MODULE_PARM_DESC(sched_policy,
 	"Scheduling policy (0 = HWS (Default), 1 = HWS without over-subscription, 2 = Non-HWS (Used for debugging only)");
@@ -2256,6 +2256,11 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
 	int ret, retry = 0, i;
 	bool supports_atomic = false;
 
+	// Just one gpu init.
+	// if (memcmp(pci_name(pdev), "0000:c3:00.0", 12) && memcmp(pci_name(pdev), "0000:c6:00.0", 12)) {
+	// 	return -ENODEV;
+	// }
+
 	/* skip devices which are owned by radeon */
 	for (i = 0; i < ARRAY_SIZE(amdgpu_unsupported_pciidlist); i++) {
 		if (amdgpu_unsupported_pciidlist[i] == pdev->device)
@@ -2339,8 +2344,9 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
 	if (!supports_atomic)
 		ddev->driver_features &= ~DRIVER_ATOMIC;
 
-	kcl_pci_create_measure_file(pdev);
-	kcl_pci_configure_extended_tags(pdev);
+	// kcl_pci_create_measure_file(pdev);
+	dev_info(&pdev->dev, "amdgpu will: %s\n", pci_name(pdev));
+	// kcl_pci_configure_extended_tags(pdev);
 	ret = pci_enable_device(pdev);
 	if (ret)
 #ifndef AMDKCL_DEVM_DRM_DEV_ALLOC
@@ -2383,62 +2389,64 @@ retry_init:
 	 * 1. don't init fbdev on hw without DCE
 	 * 2. don't init fbdev if there are no connectors
 	 */
-	if (adev->mode_info.mode_config_initialized &&
-	    !list_empty(&adev_to_drm(adev)->mode_config.connector_list)) {
-		/* select 8 bpp console on low vram cards */
-		if (adev->gmc.real_vram_size <= (32*1024*1024))
-			drm_fbdev_generic_setup(adev_to_drm(adev), 8);
-		else
-			drm_fbdev_generic_setup(adev_to_drm(adev), 32);
-	}
+	// if (adev->mode_info.mode_config_initialized &&
+	//     !list_empty(&adev_to_drm(adev)->mode_config.connector_list)) {
+	// 	/* select 8 bpp console on low vram cards */
+	// 	if (adev->gmc.real_vram_size <= (32*1024*1024))
+	// 		drm_fbdev_generic_setup(adev_to_drm(adev), 8);
+	// 	else
+	// 		drm_fbdev_generic_setup(adev_to_drm(adev), 32);
+	// }
 
-	ret = amdgpu_debugfs_init(adev);
-	if (ret)
-		DRM_ERROR("Creating debugfs files failed (%d).\n", ret);
+	// ret = amdgpu_debugfs_init(adev);
+	// if (ret)
+	// 	DRM_ERROR("Creating debugfs files failed (%d).\n", ret);
 
-	if (adev->pm.rpm_mode != AMDGPU_RUNPM_NONE) {
-		/* only need to skip on ATPX */
-		if (amdgpu_device_supports_px(ddev))
-			dev_pm_set_driver_flags(ddev->dev, DPM_FLAG_NO_DIRECT_COMPLETE);
-		/* we want direct complete for BOCO */
-		if (amdgpu_device_supports_boco(ddev))
-			dev_pm_set_driver_flags(ddev->dev, DPM_FLAG_SMART_PREPARE |
-						DPM_FLAG_SMART_SUSPEND |
-						DPM_FLAG_MAY_SKIP_RESUME);
-		pm_runtime_use_autosuspend(ddev->dev);
-		pm_runtime_set_autosuspend_delay(ddev->dev, 5000);
+	// if (adev->pm.rpm_mode != AMDGPU_RUNPM_NONE) {
+	// 	dev_info(adev->dev, "amdgpu: using %d power management\n", adev->pm.rpm_mode);
 
-		pm_runtime_allow(ddev->dev);
+	// 	/* only need to skip on ATPX */
+	// 	if (amdgpu_device_supports_px(ddev))
+	// 		dev_pm_set_driver_flags(ddev->dev, DPM_FLAG_NO_DIRECT_COMPLETE);
+	// 	/* we want direct complete for BOCO */
+	// 	if (amdgpu_device_supports_boco(ddev))
+	// 		dev_pm_set_driver_flags(ddev->dev, DPM_FLAG_SMART_PREPARE |
+	// 					DPM_FLAG_SMART_SUSPEND |
+	// 					DPM_FLAG_MAY_SKIP_RESUME);
+	// 	pm_runtime_use_autosuspend(ddev->dev);
+	// 	pm_runtime_set_autosuspend_delay(ddev->dev, 5000);
 
-		pm_runtime_mark_last_busy(ddev->dev);
-		pm_runtime_put_autosuspend(ddev->dev);
+	// 	pm_runtime_allow(ddev->dev);
 
-		pci_wake_from_d3(pdev, TRUE);
+	// 	pm_runtime_mark_last_busy(ddev->dev);
+	// 	pm_runtime_put_autosuspend(ddev->dev);
 
-		/*
-		 * For runpm implemented via BACO, PMFW will handle the
-		 * timing for BACO in and out:
-		 *   - put ASIC into BACO state only when both video and
-		 *     audio functions are in D3 state.
-		 *   - pull ASIC out of BACO state when either video or
-		 *     audio function is in D0 state.
-		 * Also, at startup, PMFW assumes both functions are in
-		 * D0 state.
-		 *
-		 * So if snd driver was loaded prior to amdgpu driver
-		 * and audio function was put into D3 state, there will
-		 * be no PMFW-aware D-state transition(D0->D3) on runpm
-		 * suspend. Thus the BACO will be not correctly kicked in.
-		 *
-		 * Via amdgpu_get_secondary_funcs(), the audio dev is put
-		 * into D0 state. Then there will be a PMFW-aware D-state
-		 * transition(D0->D3) on runpm suspend.
-		 */
-		if (amdgpu_device_supports_baco(ddev) &&
-		    !(adev->flags & AMD_IS_APU) &&
-		    (adev->asic_type >= CHIP_NAVI10))
-			amdgpu_get_secondary_funcs(adev);
-	}
+	// 	pci_wake_from_d3(pdev, TRUE);
+
+	// 	/*
+	// 	 * For runpm implemented via BACO, PMFW will handle the
+	// 	 * timing for BACO in and out:
+	// 	 *   - put ASIC into BACO state only when both video and
+	// 	 *     audio functions are in D3 state.
+	// 	 *   - pull ASIC out of BACO state when either video or
+	// 	 *     audio function is in D0 state.
+	// 	 * Also, at startup, PMFW assumes both functions are in
+	// 	 * D0 state.
+	// 	 *
+	// 	 * So if snd driver was loaded prior to amdgpu driver
+	// 	 * and audio function was put into D3 state, there will
+	// 	 * be no PMFW-aware D-state transition(D0->D3) on runpm
+	// 	 * suspend. Thus the BACO will be not correctly kicked in.
+	// 	 *
+	// 	 * Via amdgpu_get_secondary_funcs(), the audio dev is put
+	// 	 * into D0 state. Then there will be a PMFW-aware D-state
+	// 	 * transition(D0->D3) on runpm suspend.
+	// 	 */
+	// 	if (amdgpu_device_supports_baco(ddev) &&
+	// 	    !(adev->flags & AMD_IS_APU) &&
+	// 	    (adev->asic_type >= CHIP_NAVI10))
+	// 		amdgpu_get_secondary_funcs(adev);
+	// }
 
 	return 0;
 

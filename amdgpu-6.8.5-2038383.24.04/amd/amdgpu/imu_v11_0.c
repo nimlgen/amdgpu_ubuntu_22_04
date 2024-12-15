@@ -352,6 +352,8 @@ static void imu_v11_0_program_rlc_ram(struct amdgpu_device *adev)
 {
 	u32 reg_data;
 
+	dev_info(adev->dev, "IMU: Program RLC RAM\n");
+
 	WREG32_SOC15(GC, 0, regGFX_IMU_RLC_RAM_INDEX, 0x2);
 
 	switch (amdgpu_ip_version(adev, GC_HWIP, 0)) {

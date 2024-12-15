@@ -246,6 +246,8 @@ static int ih_v6_0_enable_ring(struct amdgpu_device *adev,
 	WREG32(ih_regs->ih_rb_base, ih->gpu_addr >> 8);
 	WREG32(ih_regs->ih_rb_base_hi, (ih->gpu_addr >> 40) & 0xff);
 
+	// dev_info(adev->dev, "IH_RB_BASE: 0x%llx | is_ring1: %d\n", ih->gpu_addr, ih == &adev->irq.ih1);
+
 	tmp = RREG32(ih_regs->ih_rb_cntl);
 	tmp = ih_v6_0_rb_cntl(ih, tmp);
 	if (ih == &adev->irq.ih)
@@ -268,6 +270,8 @@ static int ih_v6_0_enable_ring(struct amdgpu_device *adev,
 		/* set the ih ring 0 writeback address whether it's enabled or not */
 		WREG32(ih_regs->ih_rb_wptr_addr_lo, lower_32_bits(ih->wptr_addr));
 		WREG32(ih_regs->ih_rb_wptr_addr_hi, upper_32_bits(ih->wptr_addr) & 0xFFFF);
+
+		dev_info(adev->dev, "IH_RB_WPTR_ADDR_LO: %llx | is_ring1: %d\n", ih->wptr_addr, ih == &adev->irq.ih1);
 	}
 
 	/* set rptr, wptr to 0 */
@@ -368,7 +372,7 @@ static int ih_v6_0_irq_init(struct amdgpu_device *adev)
 	if (ret)
 		return ret;
 	/* enable wptr force update for self int */
-	force_update_wptr_for_self_int(adev, 0, 8, true);
+	// force_update_wptr_for_self_int(adev, 0, 8, true);
 
 	if (adev->irq.ih_soft.ring_size)
 		adev->irq.ih_soft.enabled = true;
@@ -600,6 +604,8 @@ static int ih_v6_0_hw_init(void *handle)
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
+	// usleep_range(1000000, 1000100);
+
 	r = ih_v6_0_irq_init(adev);
 	if (r)
 		return r;
@@ -676,8 +682,8 @@ static int ih_v6_0_set_clockgating_state(void *handle,
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
-	ih_v6_0_update_clockgating_state(adev,
-				state == AMD_CG_STATE_GATE);
+	// ih_v6_0_update_clockgating_state(adev,
+	// 			state == AMD_CG_STATE_GATE);
 	return 0;
 }
 

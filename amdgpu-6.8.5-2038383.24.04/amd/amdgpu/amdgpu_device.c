@@ -597,6 +597,12 @@ bool amdgpu_device_skip_hw_access(struct amdgpu_device *adev)
 	return false;
 }
 
+int _reg_logs = 0;
+uint32_t pref_r_reg = 0;
+uint32_t pref_w_reg = 0;
+uint32_t pref_w_v = 0xdeadc0de;
+uint32_t pref_r_reg_vv = 0xdeadc0de;
+
 /**
  * amdgpu_device_rreg - read a memory mapped IO or indirect register
  *
@@ -614,15 +620,23 @@ uint32_t amdgpu_device_rreg(struct amdgpu_device *adev,
 	if (amdgpu_device_skip_hw_access(adev))
 		return 0;
 
+
 	if ((reg * 4) < adev->rmmio_size) {
 		if (!(acc_flags & AMDGPU_REGS_NO_KIQ) &&
-		    amdgpu_sriov_runtime(adev))
+		    amdgpu_sriov_runtime(adev)) {
+			// dev_info(adev->dev, "\tUsing kiq\n", reg);
 			ret = amdgpu_kiq_rreg(adev, reg, 0);
-		else
+		}
+		else {
 			ret = readl(((void __iomem *)adev->rmmio) + (reg * 4));
+		}
 	} else {
 		ret = adev->pcie_rreg(adev, reg * 4);
 	}
+
+	if (_reg_logs && (pref_r_reg != reg || pref_r_reg_vv != ret)) dev_info(adev->dev, "Reading register 0x%x with value 0x%x\n", reg, ret);
+	pref_r_reg = reg;
+	pref_r_reg_vv = ret;
 
 	trace_amdgpu_device_rreg(adev->pdev->device, reg, ret);
 
@@ -738,16 +752,24 @@ void amdgpu_device_wreg(struct amdgpu_device *adev,
 	if (amdgpu_device_skip_hw_access(adev))
 		return;
 
+	if (_reg_logs) dev_info(adev->dev, "Writing register 0x%x with value 0x%x\n", reg, v);
 	if ((reg * 4) < adev->rmmio_size) {
 		if (!(acc_flags & AMDGPU_REGS_NO_KIQ) &&
-		    amdgpu_sriov_runtime(adev))
+		    amdgpu_sriov_runtime(adev)) {
+			// dev_info(adev->dev, "\tUsing kiq reg\n", reg, v);
 			amdgpu_kiq_wreg(adev, reg, v, 0);
-		else
+		}
+		else {
+			// if (_reg_logs) dev_info(adev->dev, "\tUsing mmio\n", reg, v);
 			writel(v, ((void __iomem *)adev->rmmio) + (reg * 4));
+		}
 	} else {
+		// if (_reg_logs) dev_info(adev->dev, "\tUsing pci\n", reg, v);
 		adev->pcie_wreg(adev, reg * 4, v);
 	}
 
+	pref_w_v = v;
+	pref_w_reg = reg;
 	trace_amdgpu_device_wreg(adev->pdev->device, reg, v);
 }
 
@@ -839,6 +861,10 @@ u32 amdgpu_device_indirect_rreg(struct amdgpu_device *adev,
 
 	pcie_index = adev->nbio.funcs->get_pcie_index_offset(adev);
 	pcie_data = adev->nbio.funcs->get_pcie_data_offset(adev);
+
+	extern int _reg_logs;
+	if (_reg_logs) dev_info(adev->dev, "Reading indirect register 0x%x with value 0x%x\n", pcie_index, pcie_data);
+	if (_reg_logs) dev_info(adev->dev, "Reading indirect register 0x%x with value 0x%x\n", pcie_data, reg_addr);
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
 	pcie_index_offset = (void __iomem *)adev->rmmio + pcie_index * 4;
@@ -1007,6 +1033,10 @@ void amdgpu_device_indirect_wreg(struct amdgpu_device *adev,
 
 	pcie_index = adev->nbio.funcs->get_pcie_index_offset(adev);
 	pcie_data = adev->nbio.funcs->get_pcie_data_offset(adev);
+
+	extern int _reg_logs;
+	if (_reg_logs) dev_info(adev->dev, "Writing indirect register 0x%x with value 0x%x\n", pcie_index, pcie_data);
+	if (_reg_logs) dev_info(adev->dev, "Writing indirect register 0x%x with value 0x%x\n", reg_addr, reg_data);
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
 	pcie_index_offset = (void __iomem *)adev->rmmio + pcie_index * 4;
@@ -1526,76 +1556,76 @@ void amdgpu_device_wb_free(struct amdgpu_device *adev, u32 wb)
  */
 int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 {
-	int rbar_size = pci_rebar_bytes_to_size(adev->gmc.real_vram_size);
-	struct pci_bus *root;
-	struct resource *res;
-	unsigned int i;
-	u16 cmd;
-	int r;
+	// int rbar_size = pci_rebar_bytes_to_size(adev->gmc.real_vram_size);
+	// struct pci_bus *root;
+	// struct resource *res;
+	// unsigned int i;
+	// u16 cmd;
+	// int r;
 
-	if (!IS_ENABLED(CONFIG_PHYS_ADDR_T_64BIT))
-		return 0;
+	// if (!IS_ENABLED(CONFIG_PHYS_ADDR_T_64BIT))
+	// 	return 0;
 
-	/* Bypass for VF */
-	if (amdgpu_sriov_vf(adev))
-		return 0;
+	// /* Bypass for VF */
+	// if (amdgpu_sriov_vf(adev))
+	// 	return 0;
 
-	/* PCI_EXT_CAP_ID_VNDR extended capability is located at 0x100 */
-	if (!pci_find_ext_capability(adev->pdev, PCI_EXT_CAP_ID_VNDR))
-		DRM_WARN("System can't access extended configuration space, please check!!\n");
+	// /* PCI_EXT_CAP_ID_VNDR extended capability is located at 0x100 */
+	// if (!pci_find_ext_capability(adev->pdev, PCI_EXT_CAP_ID_VNDR))
+	// 	DRM_WARN("System can't access extended configuration space, please check!!\n");
 
-	/* skip if the bios has already enabled large BAR */
-	if (adev->gmc.real_vram_size &&
-	    (pci_resource_len(adev->pdev, 0) >= adev->gmc.real_vram_size))
-		return 0;
+	// /* skip if the bios has already enabled large BAR */
+	// if (adev->gmc.real_vram_size &&
+	//     (pci_resource_len(adev->pdev, 0) >= adev->gmc.real_vram_size))
+	// 	return 0;
 
-	/* Check if the root BUS has 64bit memory resources */
-	root = adev->pdev->bus;
-	while (root->parent)
-		root = root->parent;
+	// /* Check if the root BUS has 64bit memory resources */
+	// root = adev->pdev->bus;
+	// while (root->parent)
+	// 	root = root->parent;
 
-	pci_bus_for_each_resource(root, res, i) {
-		if (res && res->flags & (IORESOURCE_MEM | IORESOURCE_MEM_64) &&
-		    res->start > 0x100000000ull)
-			break;
-	}
+	// pci_bus_for_each_resource(root, res, i) {
+	// 	if (res && res->flags & (IORESOURCE_MEM | IORESOURCE_MEM_64) &&
+	// 	    res->start > 0x100000000ull)
+	// 		break;
+	// }
 
-	/* Trying to resize is pointless without a root hub window above 4GB */
-	if (!res)
-		return 0;
+	// /* Trying to resize is pointless without a root hub window above 4GB */
+	// if (!res)
+	// 	return 0;
 
-	/* Limit the BAR size to what is available */
-	rbar_size = min(fls(pci_rebar_get_possible_sizes(adev->pdev, 0)) - 1,
-			rbar_size);
+	// /* Limit the BAR size to what is available */
+	// rbar_size = min(fls(pci_rebar_get_possible_sizes(adev->pdev, 0)) - 1,
+	// 		rbar_size);
 
-	/* Disable memory decoding while we change the BAR addresses and size */
-	pci_read_config_word(adev->pdev, PCI_COMMAND, &cmd);
-	pci_write_config_word(adev->pdev, PCI_COMMAND,
-			      cmd & ~PCI_COMMAND_MEMORY);
+	// /* Disable memory decoding while we change the BAR addresses and size */
+	// pci_read_config_word(adev->pdev, PCI_COMMAND, &cmd);
+	// pci_write_config_word(adev->pdev, PCI_COMMAND,
+	// 		      cmd & ~PCI_COMMAND_MEMORY);
 
-	/* Free the VRAM and doorbell BAR, we most likely need to move both. */
-	amdgpu_doorbell_fini(adev);
-	if (adev->asic_type >= CHIP_BONAIRE)
-		pci_release_resource(adev->pdev, 2);
+	// /* Free the VRAM and doorbell BAR, we most likely need to move both. */
+	// amdgpu_doorbell_fini(adev);
+	// if (adev->asic_type >= CHIP_BONAIRE)
+	// 	pci_release_resource(adev->pdev, 2);
 
-	pci_release_resource(adev->pdev, 0);
+	// pci_release_resource(adev->pdev, 0);
 
-	r = pci_resize_resource(adev->pdev, 0, rbar_size);
-	if (r == -ENOSPC)
-		DRM_INFO("Not enough PCI address space for a large BAR.");
-	else if (r && r != -ENOTSUPP)
-		DRM_ERROR("Problem resizing BAR0 (%d).", r);
+	// r = pci_resize_resource(adev->pdev, 0, rbar_size);
+	// if (r == -ENOSPC)
+	// 	DRM_INFO("Not enough PCI address space for a large BAR.");
+	// else if (r && r != -ENOTSUPP)
+	// 	DRM_ERROR("Problem resizing BAR0 (%d).", r);
 
-	pci_assign_unassigned_bus_resources(adev->pdev->bus);
+	// pci_assign_unassigned_bus_resources(adev->pdev->bus);
 
-	/* When the doorbell or fb BAR isn't available we have no chance of
-	 * using the device.
-	 */
-	r = amdgpu_doorbell_init(adev);
-	if (r || (pci_resource_flags(adev->pdev, 0) & IORESOURCE_UNSET))
-		return -ENODEV;
+	// /* When the doorbell or fb BAR isn't available we have no chance of
+	//  * using the device.
+	//  */
+	// r = amdgpu_doorbell_init(adev);
+	// if (r || (pci_resource_flags(adev->pdev, 0) & IORESOURCE_UNSET))
+	// 	return -ENODEV;
 
-	pci_write_config_word(adev->pdev, PCI_COMMAND, cmd);
+	// pci_write_config_word(adev->pdev, PCI_COMMAND, cmd);
 
 	return 0;
 }
@@ -4363,6 +4393,7 @@ fence_driver_init:
 	 * gpu instance is counted less.
 	 */
 	amdgpu_register_gpu_instance(adev);
+	// dev_info(adev->dev, "GPU instance registered\n");
 
 	/* enable clockgating, etc. after ib tests, etc. since some blocks require
 	 * explicit gating rather than handling it automatically.
@@ -5189,10 +5220,10 @@ int amdgpu_device_mode1_reset(struct amdgpu_device *adev)
 	/* Cache the state before bus master disable. The saved config space
 	 * values are used in other cases like restore after mode-2 reset.
 	 */
-	amdgpu_device_cache_pci_state(adev->pdev);
+	// amdgpu_device_cache_pci_state(adev->pdev);
 
 	/* disable BM */
-	pci_clear_master(adev->pdev);
+	// pci_clear_master(adev->pdev);
 
 	if (amdgpu_dpm_is_mode1_reset_supported(adev)) {
 		dev_info(adev->dev, "GPU smu mode1 reset\n");
@@ -5205,7 +5236,7 @@ int amdgpu_device_mode1_reset(struct amdgpu_device *adev)
 	if (ret)
 		goto mode1_reset_failed;
 
-	amdgpu_device_load_pci_state(adev->pdev);
+	// amdgpu_device_load_pci_state(adev->pdev);
 	ret = amdgpu_psp_wait_for_bootloader(adev);
 	if (ret)
 		goto mode1_reset_failed;
@@ -5925,6 +5956,10 @@ static void amdgpu_device_partner_bandwidth(struct amdgpu_device *adev,
 	if (!speed || !width)
 		return;
 
+	dev_info(adev->dev, "PCIe dynamic switching is %s\n",
+		 amdgpu_device_pcie_dynamic_switching_supported(adev) ?
+		 "supported" : "not supported");
+
 	*speed = PCI_SPEED_UNKNOWN;
 	*width = PCIE_LNK_WIDTH_UNKNOWN;
 
@@ -6121,6 +6156,12 @@ bool amdgpu_device_is_peer_accessible(struct amdgpu_device *adev,
 		!(pci_p2pdma_distance(adev->pdev, peer_adev->dev, false) < 0);
 
 #endif
+	dev_info(adev->dev, "peer access %s, p2p %s, visible_vram_size %llu, real_vram_size %llu, aper_base %llx, aper_limit %llx\n",
+		 p2p_access ? "allowed" : "denied",
+		 p2p_access ? "enabled" : "disabled",
+		 adev->gmc.visible_vram_size, adev->gmc.real_vram_size,
+		 adev->gmc.aper_base, aper_limit);
+
 	return pcie_p2p && p2p_access && (adev->gmc.visible_vram_size &&
 		adev->gmc.real_vram_size == adev->gmc.visible_vram_size &&
 		!(adev->gmc.aper_base & address_mask ||

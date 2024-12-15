@@ -320,6 +320,8 @@ int smu_cmn_send_msg_without_waiting(struct smu_context *smu,
 	if (reg == SMU_RESP_NONE ||
 	    res == -EREMOTEIO)
 		goto Out;
+	
+	dev_info(adev->dev, "Sending raw SMU message %d with param 0x%08X", msg_index, param);
 	__smu_cmn_send_msg(smu, msg_index, param);
 	res = 0;
 Out:
@@ -403,6 +405,9 @@ int smu_cmn_send_smc_msg_with_param(struct smu_context *smu,
 
 	if (adev->no_hw_access)
 		return 0;
+
+	dev_info(adev->dev, "Sending SMU message %s(%d) with param 0x%08X",
+		 smu_get_message_name(smu, msg), msg, param);
 
 	index = smu_cmn_to_asic_specific_index(smu,
 					       CMN2ASIC_MAPPING_MSG,
@@ -639,9 +644,11 @@ bool smu_cmn_clk_dpm_is_enabled(struct smu_context *smu,
 		return true;
 	}
 
+	// dev_info(smu->adev->dev, "DPM is ???\n");
 	if (!smu_cmn_feature_is_enabled(smu, feature_id))
 		return false;
 
+	// dev_info(smu->adev->dev, "DPM is enabled FOR!!\n");
 	return true;
 }
 
@@ -933,6 +940,8 @@ int smu_cmn_update_table(struct smu_context *smu,
 	if (!table_data || table_id >= SMU_TABLE_COUNT || table_id < 0)
 		return -EINVAL;
 
+	// dev_info(adev->dev, "Sending %s table %d to SMU\n",
+	// 	 drv2smu ? "driver" : "smu", table_id);
 	table_size = smu_table->tables[table_index].size;
 
 	if (drv2smu) {
@@ -944,11 +953,11 @@ int smu_cmn_update_table(struct smu_context *smu,
 		amdgpu_asic_flush_hdp(adev, NULL);
 	}
 
-	ret = smu_cmn_send_smc_msg_with_param(smu, drv2smu ?
-					  SMU_MSG_TransferTableDram2Smu :
-					  SMU_MSG_TransferTableSmu2Dram,
-					  table_id | ((argument & 0xFFFF) << 16),
-					  NULL);
+	// ret = smu_cmn_send_smc_msg_with_param(smu, drv2smu ?
+	// 				  SMU_MSG_TransferTableDram2Smu :
+	// 				  SMU_MSG_TransferTableSmu2Dram,
+	// 				  table_id | ((argument & 0xFFFF) << 16),
+	// 				  NULL);
 	if (ret)
 		return ret;
 
