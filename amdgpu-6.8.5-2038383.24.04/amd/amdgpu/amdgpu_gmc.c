@@ -678,6 +678,10 @@ int amdgpu_gmc_flush_gpu_tlb_pasid(struct amdgpu_device *adev, uint16_t pasid,
 				   uint32_t flush_type, bool all_hub,
 				   uint32_t inst)
 {
+	amdgpu_gmc_flush_gpu_tlb(adev, 8, AMDGPU_GFXHUB(0), flush_type);
+	amdgpu_gmc_flush_gpu_tlb(adev, 8, AMDGPU_MMHUB0(0), flush_type);
+	return 0;
+
 // 	u32 usec_timeout = amdgpu_sriov_vf(adev) ? SRIOV_USEC_TIMEOUT :
 // 		adev->usec_timeout;
 // 	struct amdgpu_ring *ring = &adev->gfx.kiq[inst].ring;

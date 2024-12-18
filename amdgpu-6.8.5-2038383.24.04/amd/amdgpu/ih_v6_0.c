@@ -413,6 +413,8 @@ static u32 ih_v6_0_get_wptr(struct amdgpu_device *adev,
 	u32 wptr, tmp;
 	struct amdgpu_ih_regs *ih_regs;
 
+	dev_info(adev->dev, "ih_v6_0_get_wptr\n");
+
 	wptr = le32_to_cpu(*ih->wptr_cpu);
 	ih_regs = &ih->ih_regs;
 
