@@ -4768,25 +4768,25 @@ static int gfx_v11_0_set_powergating_state(void *handle,
 static int gfx_v11_0_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
-	// struct amdgpu_device *adev = (struct amdgpu_device *)handle;
+	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
-	// if (amdgpu_sriov_vf(adev))
-	//         return 0;
+	if (amdgpu_sriov_vf(adev))
+	        return 0;
 
-	// switch (amdgpu_ip_version(adev, GC_HWIP, 0)) {
-	// case IP_VERSION(11, 0, 0):
-	// case IP_VERSION(11, 0, 1):
-	// case IP_VERSION(11, 0, 2):
-	// case IP_VERSION(11, 0, 3):
-	// case IP_VERSION(11, 0, 4):
-	// case IP_VERSION(11, 5, 0):
-	// case IP_VERSION(11, 5, 1):
-	//         gfx_v11_0_update_gfx_clock_gating(adev,
-	//                         state ==  AMD_CG_STATE_GATE);
-	//         break;
-	// default:
-	//         break;
-	// }
+	switch (amdgpu_ip_version(adev, GC_HWIP, 0)) {
+	case IP_VERSION(11, 0, 0):
+	case IP_VERSION(11, 0, 1):
+	case IP_VERSION(11, 0, 2):
+	case IP_VERSION(11, 0, 3):
+	case IP_VERSION(11, 0, 4):
+	case IP_VERSION(11, 5, 0):
+	case IP_VERSION(11, 5, 1):
+	        gfx_v11_0_update_gfx_clock_gating(adev,
+	                        state ==  AMD_CG_STATE_GATE);
+	        break;
+	default:
+	        break;
+	}
 
 	return 0;
 }

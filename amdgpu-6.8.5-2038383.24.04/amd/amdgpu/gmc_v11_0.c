@@ -1023,16 +1023,16 @@ static int gmc_v11_0_soft_reset(void *handle)
 static int gmc_v11_0_set_clockgating_state(void *handle,
 					   enum amd_clockgating_state state)
 {
-	// int r;
-	// struct amdgpu_device *adev = (struct amdgpu_device *)handle;
+	int r;
+	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
-	// dev_info(adev->dev, "gmc_v11_0_set_clockgating_state.\n");
+	dev_info(adev->dev, "gmc_v11_0_set_clockgating_state.\n");
 
-	// r = adev->mmhub.funcs->set_clockgating(adev, state);
-	// if (r)
-	// 	return r;
+	r = adev->mmhub.funcs->set_clockgating(adev, state);
+	if (r)
+		return r;
 
-	// return athub_v3_0_set_clockgating(adev, state);
+	return athub_v3_0_set_clockgating(adev, state);
 
 	return 0;
 }
