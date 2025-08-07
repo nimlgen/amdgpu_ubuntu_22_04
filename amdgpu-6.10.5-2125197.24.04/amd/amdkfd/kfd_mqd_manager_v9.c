@@ -738,7 +738,7 @@ static void init_mqd_v9_4_3(struct mqd_manager *mm, void **mqd,
 				upper_32_bits(xcc_ctx_save_restore_area_address);
 		}
 
-		if (true) {
+		if (q->format == KFD_QUEUE_FORMAT_AQL) {
 			m->compute_tg_chunk_size = 1;
 			m->compute_current_logic_xcc_id =
 					(local_xcc_start + xcc) %
@@ -753,16 +753,11 @@ static void init_mqd_v9_4_3(struct mqd_manager *mm, void **mqd,
 			default:
 				break;
 			}
-
-			dev_info(mm->dev->adev->dev, "::set %x", xcc);
-			// m->pm4_target_xcc_in_xcp = q->pm4_target_xcc;
-			// m->pm4_target_xcc_in_xcp = 0x0;
 		} else {
 			/* PM4 Queue */
-			dev_info(mm->dev->adev->dev, "set %x", xcc);
-			// m->compute_current_logic_xcc_id = xcc;
-			// m->compute_tg_chunk_size = 1;
-			// m->pm4_target_xcc_in_xcp = q->pm4_target_xcc;
+			m->compute_current_logic_xcc_id = 0;
+			m->compute_tg_chunk_size = 0;
+			m->pm4_target_xcc_in_xcp = q->pm4_target_xcc;
 		}
 
 		if (xcc == 0) {
@@ -786,7 +781,7 @@ static void update_mqd_v9_4_3(struct mqd_manager *mm, void *mqd,
 
 		update_cu_mask(mm, m, minfo, xcc);
 		
-		if (true) {
+		if (q->format == KFD_QUEUE_FORMAT_AQL) {
 			switch (xcc) {
 			case 0:
 				/* Master XCC */
@@ -797,13 +792,11 @@ static void update_mqd_v9_4_3(struct mqd_manager *mm, void *mqd,
 				break;
 			}
 			m->compute_tg_chunk_size = 1;
-			// m->pm4_target_xcc_in_xcp = 0x0;
 		} else {
 			/* PM4 Queue */
-			dev_info(mm->dev->adev->dev, "upd set %x", xcc);
-			m->compute_current_logic_xcc_id = xcc;
-			m->compute_tg_chunk_size = 1;
-			m->pm4_target_xcc_in_xcp = xcc;
+			m->compute_current_logic_xcc_id = 0;
+			m->compute_tg_chunk_size = 0;
+			m->pm4_target_xcc_in_xcp = q->pm4_target_xcc;
 		}
 	}
 }
