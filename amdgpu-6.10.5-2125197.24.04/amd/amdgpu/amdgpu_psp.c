@@ -249,6 +249,9 @@ static int psp_early_init(struct amdgpu_ip_block *ip_block)
 		return -EINVAL;
 	}
 
+	dev_info(adev->dev, "PSP early init done, autoload supported: %d, boot time TMR: %d\n",
+			psp->autoload_supported, psp->boot_time_tmr);
+
 	psp->adev = adev;
 
 	adev->psp_timeout = 20000;
@@ -774,6 +777,9 @@ static void psp_prep_tmr_cmd_buf(struct psp_context *psp,
 		tmr_pa = amdgpu_gmc_vram_pa(adev, tmr_bo);
 	}
 
+	dev_info(adev->dev, "reserve pa: 0x%llx, mc: 0x%x for PSP TMR\n",
+		 tmr_pa, size);
+
 	if (amdgpu_sriov_vf(psp->adev))
 		cmd->cmd_id = GFX_CMD_ID_SETUP_VMR;
 	else
@@ -833,6 +839,8 @@ static int psp_tmr_init(struct psp_context *psp)
 	 * uninitializes.
 	 */
 	tmr_size = PSP_TMR_SIZE(psp->adev);
+
+	dev_info(psp->adev->dev, "reserve %d bytes for PSP TMR\n", tmr_size);
 
 	/* For ASICs support RLC autoload, psp will parse the toc
 	 * and calculate the total size of TMR needed
@@ -2415,6 +2423,7 @@ static int psp_hw_start(struct psp_context *psp)
 		goto skip_pin_bo;
 
 	if (!psp->boot_time_tmr || psp->autoload_supported) {
+		dev_info(adev->dev, "PSP TMR WILL be initialized\n");
 		ret = psp_tmr_init(psp);
 		if (ret) {
 			dev_err(adev->dev, "PSP tmr init failed!\n");
@@ -2429,12 +2438,14 @@ skip_pin_bo:
 	 * loaded and before other non-psp firmware loaded.
 	 */
 	if (psp->pmfw_centralized_cstate_management) {
+		dev_info(adev->dev, "SMU FW LOAD\n");
 		ret = psp_load_smu_fw(psp);
 		if (ret)
 			return ret;
 	}
 
 	if (!psp->boot_time_tmr || !psp->autoload_supported) {
+		dev_info(adev->dev, "PSP TMR initialized successfully\n");
 		ret = psp_tmr_load(psp);
 		if (ret) {
 			dev_err(adev->dev, "PSP load tmr failed!\n");
@@ -2737,6 +2748,9 @@ int psp_execute_ip_fw_load(struct psp_context *psp,
 {
 	int ret = 0;
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
+
+	dev_info(psp->adev->dev, "PSP load IP firmware %s(0x%X) ",
+			 amdgpu_ucode_name(ucode->ucode_id), ucode->ucode_id);
 
 	ret = psp_prep_load_ip_fw_cmd_buf(psp, ucode, cmd);
 	if (!ret) {
@@ -3219,6 +3233,8 @@ int psp_gpu_reset(struct amdgpu_device *adev)
 	if (adev->firmware.load_type != AMDGPU_FW_LOAD_PSP)
 		return 0;
 
+	dev_info(adev->dev, "PSP is resetting...\n");
+
 	mutex_lock(&adev->psp.mutex);
 	ret = psp_mode1_reset(&adev->psp);
 	mutex_unlock(&adev->psp.mutex);
@@ -3286,6 +3302,9 @@ int psp_ring_cmd_submit(struct psp_context *psp,
 	write_frame->fence_addr_lo = lower_32_bits(fence_mc_addr);
 	write_frame->fence_value = index;
 	amdgpu_device_flush_hdp(adev, NULL);
+
+	dev_info(adev->dev, "PSP ring cmd submit: cmd_buf_mc_addr = 0x%016llX, fence_mc_addr = 0x%016llX, index = %d\n",
+			cmd_buf_mc_addr, fence_mc_addr, index);
 
 	/* Update the write Pointer in DWORDs */
 	psp_write_ptr_reg = (psp_write_ptr_reg + rb_frame_size_dw) % ring_size_dw;

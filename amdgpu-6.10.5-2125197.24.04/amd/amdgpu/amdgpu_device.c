@@ -2865,9 +2865,9 @@ static int amdgpu_device_ip_init(struct amdgpu_device *adev)
 	bool init_badpage;
 	int i, r;
 
-	r = amdgpu_ras_init(adev);
-	if (r)
-		return r;
+	// r = amdgpu_ras_init(adev);
+	// if (r)
+	// 	return r;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
 		if (!adev->ip_blocks[i].status.valid)
@@ -4575,8 +4575,8 @@ fence_driver_init:
 	if (px)
 		vga_switcheroo_init_domain_pm_ops(adev->dev, &adev->vga_pm_domain);
 
-	if (adev->init_lvl->level == AMDGPU_INIT_LEVEL_MINIMAL_XGMI)
-		amdgpu_xgmi_reset_on_init(adev);
+	// if (adev->init_lvl->level == AMDGPU_INIT_LEVEL_MINIMAL_XGMI)
+	// 	amdgpu_xgmi_reset_on_init(adev);
 
 	amdgpu_device_check_iommu_direct_map(adev);
 
@@ -5371,6 +5371,8 @@ int amdgpu_device_pre_asic_reset(struct amdgpu_device *adev,
 
 	if (amdgpu_sriov_vf(adev))
 		amdgpu_virt_pre_reset(adev);
+
+	dev_info(adev->dev, "amdgpu: preparing for asic reset...\n");
 
 	amdgpu_fence_driver_isr_toggle(adev, true);
 

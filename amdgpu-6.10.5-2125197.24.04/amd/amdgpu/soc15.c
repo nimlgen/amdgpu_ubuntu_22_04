@@ -608,6 +608,8 @@ static int soc15_asic_reset(struct amdgpu_device *adev)
 		!soc15_need_reset_on_resume(adev))
 		return 0;
 
+	dev_info(adev->dev, "asic reset\n");
+
 	switch (soc15_asic_reset_method(adev)) {
 	case AMD_RESET_METHOD_PCI:
 		dev_info(adev->dev, "PCI reset\n");
@@ -827,6 +829,8 @@ static bool soc15_need_reset_on_init(struct amdgpu_device *adev)
 {
 	u32 sol_reg;
 
+	dev_info(adev->dev, "asked if needs reset on init\n");
+
 	/* CP hangs in IGT reloading test on RN, reset to WA */
 	if (adev->asic_type == CHIP_RENOIR)
 		return true;
@@ -848,6 +852,7 @@ static bool soc15_need_reset_on_init(struct amdgpu_device *adev)
 	 * are already been loaded.
 	 */
 	sol_reg = RREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_81);
+	dev_info(adev->dev, "sOS sign of life register: 0x%08x\n", sol_reg);
 	if (sol_reg)
 		return true;
 

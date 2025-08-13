@@ -229,12 +229,17 @@ static int psp_v13_0_bootloader_load_component(struct psp_context  	*psp,
 	/* Check tOS sign of life register to confirm sys driver and sOS
 	 * are already been loaded.
 	 */
+	
+	dev_info(adev->dev, "psp_v13_0_bootloader_load_component: 0x%x\n", bl_cmd);
+
 	if (psp_v13_0_is_sos_alive(psp))
 		return 0;
 
 	ret = psp_v13_0_wait_for_bootloader(psp);
 	if (ret)
 		return ret;
+
+	dev_info(adev->dev, "\tdo psp_v13_0_bootloader_load_component: 0x%x\n", bl_cmd);
 
 	memset(psp->fw_pri_buf, 0, PSP_1_MEG);
 
@@ -304,11 +309,13 @@ static int psp_v13_0_bootloader_load_sos(struct psp_context *psp)
 	/* Check sOS sign of life register to confirm sys driver and sOS
 	 * are already been loaded.
 	 */
+	dev_info(adev->dev, "psp_v13_0_bootloader_load_sos before sos check\n");
 	if (psp_v13_0_is_sos_alive(psp)) {
 		psp_v13_0_init_sos_version(psp);
 		return 0;
 	}
 
+	dev_info(adev->dev, "psp_v13_0_bootloader_load_sos sos not alive\n");
 	ret = psp_v13_0_wait_for_bootloader(psp);
 	if (ret)
 		return ret;

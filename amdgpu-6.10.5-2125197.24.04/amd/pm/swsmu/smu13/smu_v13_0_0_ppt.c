@@ -2801,6 +2801,8 @@ static int smu_v13_0_0_mode1_reset(struct smu_context *smu)
 	uint32_t param;
 	struct amdgpu_device *adev = smu->adev;
 
+	dev_info(smu->adev->dev, "SMU mode1 reset [xx]\n");
+
 	switch (amdgpu_ip_version(adev, MP1_HWIP, 0)) {
 	case IP_VERSION(13, 0, 0):
 		/* SMU 13_0_0 PMFW supports RAS fatal error reset from 78.77 */

@@ -1546,9 +1546,9 @@ static void amdgpu_xgmi_reset_on_init_work(struct work_struct *work)
 
 static void amdgpu_xgmi_schedule_reset_on_init(struct amdgpu_hive_info *hive)
 {
-	INIT_WORK(&hive->reset_on_init_work, amdgpu_xgmi_reset_on_init_work);
-	amdgpu_reset_domain_schedule(hive->reset_domain,
-				     &hive->reset_on_init_work);
+	// INIT_WORK(&hive->reset_on_init_work, amdgpu_xgmi_reset_on_init_work);
+	// amdgpu_reset_domain_schedule(hive->reset_domain,
+	// 			     &hive->reset_on_init_work);
 }
 
 int amdgpu_xgmi_reset_on_init(struct amdgpu_device *adev)

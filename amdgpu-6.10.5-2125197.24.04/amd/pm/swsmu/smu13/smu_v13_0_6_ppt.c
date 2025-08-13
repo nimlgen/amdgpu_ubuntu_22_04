@@ -317,6 +317,7 @@ static int smu_v13_0_6_init_microcode(struct smu_context *smu)
 	p2stable_count = le32_to_cpu(v2_1->pptable_count);
 	for (i = 0; i < p2stable_count; i++) {
 		if (le32_to_cpu(entries[i].id) == p2s_table_id) {
+			dev_info(adev->dev, "Found P2S table %d\n", i);
 			smu->pptable_firmware.data =
 				((uint8_t *)v2_1 +
 				 le32_to_cpu(entries[i].ppt_offset_bytes));
@@ -2802,6 +2803,7 @@ static int smu_v13_0_6_mode1_reset(struct smu_context *smu)
 		fatal_err = 1;
 
 	param |= (fatal_err << 16);
+	dev_info(adev->dev, "SMU mode1 reset wooooo %d\n", param);
 	ret = smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_GfxDeviceDriverReset,
 					      param, NULL);
 

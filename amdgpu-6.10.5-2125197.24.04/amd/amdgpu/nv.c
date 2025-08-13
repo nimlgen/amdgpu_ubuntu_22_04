@@ -476,6 +476,8 @@ static int nv_asic_reset(struct amdgpu_device *adev)
 {
 	int ret = 0;
 
+	dev_info(adev->dev, "asic reset old\n");
+
 	switch (nv_asic_reset_method(adev)) {
 	case AMD_RESET_METHOD_PCI:
 		dev_info(adev->dev, "PCI reset\n");

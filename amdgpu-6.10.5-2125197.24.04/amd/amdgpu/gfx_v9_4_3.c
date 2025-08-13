@@ -426,7 +426,7 @@ static int gfx_v9_4_3_ring_test_ring(struct amdgpu_ring *ring)
 	int r;
 
 	/* Use register offset which is local to XCC in the packet */
-	dev_info(adev->dev, "tets on xcc %d, but set is %d", ring->xcc_id, 0);
+	// dev_info(adev->dev, "tets on xcc %d, but set is %d", ring->xcc_id, 0);
 	xcc_offset = SOC15_REG_OFFSET(GC, 0, regSCRATCH_REG0);
 	scratch_reg0_offset = SOC15_REG_OFFSET(GC, GET_INST(GC, ring->xcc_id), regSCRATCH_REG0);
 	WREG32(scratch_reg0_offset, 0xCAFEDEAD);
@@ -2355,6 +2355,8 @@ static int gfx_v9_4_3_hw_init(struct amdgpu_ip_block *ip_block)
 {
 	int r;
 	struct amdgpu_device *adev = ip_block->adev;
+
+	dev_info(adev->dev, "gfx v9.4.3 hw init start\n");
 
 	amdgpu_gfx_cleaner_shader_init(adev, adev->gfx.cleaner_shader_size,
 				       adev->gfx.cleaner_shader_ptr);
