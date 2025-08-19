@@ -1456,6 +1456,7 @@ int amdgpu_ucode_request(struct amdgpu_device *adev, const struct firmware **fw,
 		return -EOVERFLOW;
 	}
 
+	dev_info(adev->dev, "\"%s\" fw requested to load\n", fname);
 	r = request_firmware(fw, fname, adev->dev);
 	if (r)
 		return -ENODEV;

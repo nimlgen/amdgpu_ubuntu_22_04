@@ -1266,8 +1266,10 @@ static int soc15_common_hw_init(struct amdgpu_ip_block *ip_block)
 {
 	struct amdgpu_device *adev = ip_block->adev;
 
+	dev_info(adev->dev, "soc15_common_hw_init\n");
+	
 	/* enable aspm */
-	soc15_program_aspm(adev);
+	// soc15_program_aspm(adev);
 	/* setup nbio registers */
 	adev->nbio.funcs->init_registers(adev);
 	/* remap HDP registers to a hole in mmio space,
@@ -1287,6 +1289,8 @@ static int soc15_common_hw_init(struct amdgpu_ip_block *ip_block)
 	 * happens before CP.
 	 */
 	soc15_sdma_doorbell_range_init(adev);
+
+	dev_info(adev->dev, "soc15_common_hw_init done\n");
 
 	return 0;
 }

@@ -621,20 +621,20 @@ int amdgpu_irq_get(struct amdgpu_device *adev, struct amdgpu_irq_src *src,
 int amdgpu_irq_put(struct amdgpu_device *adev, struct amdgpu_irq_src *src,
 		   unsigned int type)
 {
-	if (!adev->irq.installed)
-		return -ENOENT;
+	// if (!adev->irq.installed)
+	// 	return -ENOENT;
 
-	if (type >= src->num_types)
-		return -EINVAL;
+	// if (type >= src->num_types)
+	// 	return -EINVAL;
 
-	if (!src->enabled_types || !src->funcs->set)
-		return -EINVAL;
+	// if (!src->enabled_types || !src->funcs->set)
+	// 	return -EINVAL;
 
-	if (WARN_ON(!amdgpu_irq_enabled(adev, src, type)))
-		return -EINVAL;
+	// if (WARN_ON(!amdgpu_irq_enabled(adev, src, type)))
+	// 	return -EINVAL;
 
-	if (atomic_dec_and_test(&src->enabled_types[type]))
-		return amdgpu_irq_update(adev, src, type);
+	// if (atomic_dec_and_test(&src->enabled_types[type]))
+	// 	return amdgpu_irq_update(adev, src, type);
 
 	return 0;
 }

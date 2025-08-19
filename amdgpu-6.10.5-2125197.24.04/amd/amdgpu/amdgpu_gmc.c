@@ -224,9 +224,9 @@ void amdgpu_gmc_vram_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc,
 		mc->fb_start = mc->vram_start;
 		mc->fb_end = mc->vram_end;
 	}
-	dev_info(adev->dev, "VRAM: %lluM 0x%016llX - 0x%016llX (%lluM used)\n",
+	dev_info(adev->dev, "VRAM2: %lluM 0x%016llX - 0x%016llX 0x%016llX (%lluM used)\n",
 			mc->mc_vram_size >> 20, mc->vram_start,
-			mc->vram_end, mc->real_vram_size >> 20);
+			mc->vram_end, mc->fb_end, mc->real_vram_size >> 20);
 }
 
 /** amdgpu_gmc_sysvm_location - place vram and gart in sysvm aperture
@@ -260,6 +260,11 @@ void amdgpu_gmc_sysvm_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc
 			mc->vram_end, mc->real_vram_size >> 20);
 	dev_info(adev->dev, "GART: %lluM 0x%016llX - 0x%016llX\n",
 			mc->gart_size >> 20, mc->gart_start, mc->gart_end);
+	dev_info(adev->dev, "Using sysvm aperture for vram and gart\n");
+	dev_info(adev->dev, "hive_vram_start: 0x%016llX, hive_vram_end: 0x%016llX\n",
+			hive_vram_start, hive_vram_end);
+	dev_info(adev->dev, "hive_vram_size: %llu\n", mc->xgmi.node_segment_size);
+	dev_info(adev->dev, "phys nodes: %llu\n", mc->xgmi.num_physical_nodes);
 }
 
 /**

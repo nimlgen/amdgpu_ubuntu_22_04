@@ -1708,6 +1708,7 @@ static void gfx_v9_4_3_xcc_cp_compute_enable(struct amdgpu_device *adev,
 	if (enable) {
 		WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_MEC_CNTL, 0);
 	} else {
+		
 		WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regCP_MEC_CNTL,
 			(CP_MEC_CNTL__MEC_INVALIDATE_ICACHE_MASK |
 			 CP_MEC_CNTL__MEC_ME1_PIPE0_RESET_MASK |
@@ -1814,12 +1815,12 @@ static int gfx_v9_4_3_xcc_mqd_init(struct amdgpu_ring *ring, int xcc_id)
 	mqd->compute_static_thread_mgmt_se3 = 0xffffffff;
 	mqd->compute_misc_reserved = 0x00000003;
 
-	mqd->dynamic_cu_mask_addr_lo =
-		lower_32_bits(ring->mqd_gpu_addr
-			      + offsetof(struct v9_mqd_allocation, dynamic_cu_mask));
-	mqd->dynamic_cu_mask_addr_hi =
-		upper_32_bits(ring->mqd_gpu_addr
-			      + offsetof(struct v9_mqd_allocation, dynamic_cu_mask));
+	// mqd->dynamic_cu_mask_addr_lo =
+	// 	lower_32_bits(ring->mqd_gpu_addr
+	// 		      + offsetof(struct v9_mqd_allocation, dynamic_cu_mask));
+	// mqd->dynamic_cu_mask_addr_hi =
+	// 	upper_32_bits(ring->mqd_gpu_addr
+	// 		      + offsetof(struct v9_mqd_allocation, dynamic_cu_mask));
 
 	eop_base_addr = ring->eop_gpu_addr >> 8;
 	mqd->cp_hqd_eop_base_addr_lo = eop_base_addr;
@@ -2248,7 +2249,7 @@ static int gfx_v9_4_3_xcc_cp_resume(struct amdgpu_device *adev, int xcc_id)
 	struct amdgpu_ring *ring;
 	int r, j;
 
-	gfx_v9_4_3_xcc_enable_gui_idle_interrupt(adev, false, xcc_id);
+	// gfx_v9_4_3_xcc_enable_gui_idle_interrupt(adev, false, xcc_id);
 
 	if (adev->firmware.load_type != AMDGPU_FW_LOAD_PSP) {
 		gfx_v9_4_3_xcc_disable_gpa_mode(adev, xcc_id);
@@ -2257,6 +2258,7 @@ static int gfx_v9_4_3_xcc_cp_resume(struct amdgpu_device *adev, int xcc_id)
 		if (r)
 			return r;
 	} else {
+		dev_info(adev->dev, "gfx v9.4.3 xcc %d load microcode from psp\n", xcc_id);
 		gfx_v9_4_3_xcc_cp_compute_enable(adev, false, xcc_id);
 	}
 
@@ -2268,15 +2270,15 @@ static int gfx_v9_4_3_xcc_cp_resume(struct amdgpu_device *adev, int xcc_id)
 	if (r)
 		return r;
 
-	for (j = 0; j < adev->gfx.num_compute_rings; j++) {
-		ring = &adev->gfx.compute_ring
-				[j + xcc_id * adev->gfx.num_compute_rings];
-		r = amdgpu_ring_test_helper(ring);
-		if (r)
-			return r;
-	}
+	// for (j = 0; j < adev->gfx.num_compute_rings; j++) {
+	// 	ring = &adev->gfx.compute_ring
+	// 			[j + xcc_id * adev->gfx.num_compute_rings];
+	// 	r = amdgpu_ring_test_helper(ring);
+	// 	if (r)
+	// 		return r;
+	// }
 
-	gfx_v9_4_3_xcc_enable_gui_idle_interrupt(adev, true, xcc_id);
+	// gfx_v9_4_3_xcc_enable_gui_idle_interrupt(adev, true, xcc_id);
 
 	return 0;
 }
@@ -2302,6 +2304,7 @@ static int gfx_v9_4_3_cp_resume(struct amdgpu_device *adev)
 		if (amdgpu_xcp_query_partition_mode(adev->xcp_mgr,
 						    AMDGPU_XCP_FL_NONE) ==
 		    AMDGPU_UNKNOWN_COMPUTE_PARTITION_MODE)
+			dev_info(adev->dev, "gfx v9.4.3 xcp_switch_partition_mode\n");
 			r = amdgpu_xcp_switch_partition_mode(
 				adev->xcp_mgr, amdgpu_user_partt_mode);
 	}
@@ -2309,6 +2312,7 @@ static int gfx_v9_4_3_cp_resume(struct amdgpu_device *adev)
 		return r;
 
 	for (i = 0; i < num_xcc; i++) {
+		dev_info(adev->dev, "gfx v9.4.3 %d\n", i);
 		r = gfx_v9_4_3_xcc_cp_resume(adev, i);
 		if (r)
 			return r;
@@ -2358,18 +2362,21 @@ static int gfx_v9_4_3_hw_init(struct amdgpu_ip_block *ip_block)
 
 	dev_info(adev->dev, "gfx v9.4.3 hw init start\n");
 
-	amdgpu_gfx_cleaner_shader_init(adev, adev->gfx.cleaner_shader_size,
-				       adev->gfx.cleaner_shader_ptr);
+	// amdgpu_gfx_cleaner_shader_init(adev, adev->gfx.cleaner_shader_size,
+	// 			       adev->gfx.cleaner_shader_ptr);
 
-	if (!amdgpu_sriov_vf(adev))
-		gfx_v9_4_3_init_golden_registers(adev);
+	// if (!amdgpu_sriov_vf(adev))
+	// 	gfx_v9_4_3_init_golden_registers(adev);
 
+	dev_info(adev->dev, "gfx v9.4.3 gfx_v9_4_3_constants_init\n");
 	gfx_v9_4_3_constants_init(adev);
 
+	dev_info(adev->dev, "gfx v9.4.3 rlc.funcs->resume\n");
 	r = adev->gfx.rlc.funcs->resume(adev);
 	if (r)
 		return r;
 
+	dev_info(adev->dev, "gfx v9.4.3 cp_resume\n");
 	r = gfx_v9_4_3_cp_resume(adev);
 	if (r)
 		return r;

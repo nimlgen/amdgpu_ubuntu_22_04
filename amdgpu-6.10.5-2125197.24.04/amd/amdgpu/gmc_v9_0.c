@@ -1698,9 +1698,13 @@ static void gmc_v9_0_vram_gtt_location(struct amdgpu_device *adev,
 
 	/* add the xgmi offset of the physical node */
 	base += adev->gmc.xgmi.physical_node_id * adev->gmc.xgmi.node_segment_size;
+	dev_info(adev->dev, "Using VRAM XGMI location: 0x%llx 0x%llx\n", adev->gmc.xgmi.physical_node_id, adev->gmc.xgmi.node_segment_size);
+
 	if (adev->gmc.xgmi.connected_to_cpu) {
 		amdgpu_gmc_sysvm_location(adev, mc);
 	} else {
+		dev_info(adev->dev, "Using VRAM LOC location: 0x%llx\n", base);
+
 		amdgpu_gmc_vram_location(adev, mc, base);
 		amdgpu_gmc_gart_location(adev, mc, AMDGPU_GART_PLACEMENT_BEST_FIT);
 		if (!amdgpu_sriov_vf(adev) && (amdgpu_agp == 1))
@@ -1708,10 +1712,15 @@ static void gmc_v9_0_vram_gtt_location(struct amdgpu_device *adev,
 	}
 	/* base offset of vram pages */
 	adev->vm_manager.vram_base_offset = adev->gfxhub.funcs->get_mc_fb_offset(adev);
+	dev_info(adev->dev, "VRAM base offset: 0x%llx\n",
+		adev->vm_manager.vram_base_offset);
 
 	/* XXX: add the xgmi offset of the physical node? */
 	adev->vm_manager.vram_base_offset +=
 		adev->gmc.xgmi.physical_node_id * adev->gmc.xgmi.node_segment_size;
+	
+	dev_info(adev->dev, "VRAM+++ base offset: 0x%llx\n",
+		adev->vm_manager.vram_base_offset);
 }
 
 /**
@@ -2151,6 +2160,7 @@ static int gmc_v9_0_sw_init(struct amdgpu_ip_block *ip_block)
 				  NUM_XCC(adev->gfx.xcc_mask));
 
 		inst_mask <<= AMDGPU_MMHUB0(0);
+		dev_info(adev->dev, "MMHUB mask: 0x%lx\n", inst_mask);
 		bitmap_or(adev->vmhubs_mask, adev->vmhubs_mask, &inst_mask, 32);
 
 		amdgpu_vm_adjust_size(adev, 256 * 1024, 9, 3, 48);
@@ -2294,6 +2304,8 @@ static int gmc_v9_0_sw_fini(struct amdgpu_ip_block *ip_block)
 
 static void gmc_v9_0_init_golden_registers(struct amdgpu_device *adev)
 {
+	dev_info(adev->dev, "Initializing golden registers\n");
+	
 	switch (amdgpu_ip_version(adev, MMHUB_HWIP, 0)) {
 	case IP_VERSION(9, 0, 0):
 		if (amdgpu_sriov_vf(adev))
@@ -2317,6 +2329,8 @@ static void gmc_v9_0_init_golden_registers(struct amdgpu_device *adev)
 	default:
 		break;
 	}
+
+	dev_info(adev->dev, "Finish Initializing golden registers\n");
 }
 
 /**
@@ -2405,9 +2419,9 @@ static int gmc_v9_0_hw_init(struct amdgpu_ip_block *ip_block)
 
 	if (adev->mode_info.num_crtc) {
 		/* Lockout access through VGA aperture*/
-		WREG32_FIELD15(DCE, 0, VGA_HDP_CONTROL, VGA_MEMORY_DISABLE, 1);
-		/* disable VGA render */
-		WREG32_FIELD15(DCE, 0, VGA_RENDER_CONTROL, VGA_VSTATUS_CNTL, 0);
+		// WREG32_FIELD15(DCE, 0, VGA_HDP_CONTROL, VGA_MEMORY_DISABLE, 1);
+		// /* disable VGA render */
+		// WREG32_FIELD15(DCE, 0, VGA_RENDER_CONTROL, VGA_VSTATUS_CNTL, 0);
 	}
 
 	if (adev->mmhub.funcs->update_power_gating)
@@ -2485,13 +2499,13 @@ static int gmc_v9_0_hw_fini(struct amdgpu_ip_block *ip_block)
 	 * For minimal init, late_init is not called, hence VM fault/RAS irqs
 	 * are not enabled.
 	 */
-	if (adev->init_lvl->level != AMDGPU_INIT_LEVEL_MINIMAL_XGMI) {
-		amdgpu_irq_put(adev, &adev->gmc.vm_fault, 0);
+	// if (adev->init_lvl->level != AMDGPU_INIT_LEVEL_MINIMAL_XGMI) {
+	// 	amdgpu_irq_put(adev, &adev->gmc.vm_fault, 0);
 
-		if (adev->gmc.ecc_irq.funcs &&
-		    amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__UMC))
-			amdgpu_irq_put(adev, &adev->gmc.ecc_irq, 0);
-	}
+	// 	if (adev->gmc.ecc_irq.funcs &&
+	// 	    amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__UMC))
+	// 		amdgpu_irq_put(adev, &adev->gmc.ecc_irq, 0);
+	// }
 
 	return 0;
 }

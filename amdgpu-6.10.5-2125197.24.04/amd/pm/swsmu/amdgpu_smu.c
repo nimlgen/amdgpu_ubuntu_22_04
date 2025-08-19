@@ -1720,17 +1720,17 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		return ret;
 	}
 
-	ret = smu_enable_thermal_alert(smu);
-	if (ret) {
-	  dev_err(adev->dev, "Failed to enable thermal alert!\n");
-	  return ret;
-	}
+	// ret = smu_enable_thermal_alert(smu);
+	// if (ret) {
+	//   dev_err(adev->dev, "Failed to enable thermal alert!\n");
+	//   return ret;
+	// }
 
-	ret = smu_notify_display_change(smu);
-	if (ret) {
-		dev_err(adev->dev, "Failed to notify display change!\n");
-		return ret;
-	}
+	// ret = smu_notify_display_change(smu);
+	// if (ret) {
+	// 	dev_err(adev->dev, "Failed to notify display change!\n");
+	// 	return ret;
+	// }
 
 	/*
 	 * Set min deep sleep dce fclk with bootup value from vbios via
@@ -1978,11 +1978,11 @@ static int smu_smc_hw_cleanup(struct smu_context *smu)
 	cancel_work_sync(&smu->throttling_logging_work);
 	cancel_work_sync(&smu->interrupt_work);
 
-	ret = smu_disable_thermal_alert(smu);
-	if (ret) {
-		dev_err(adev->dev, "Fail to disable thermal alert!\n");
-		return ret;
-	}
+	// ret = smu_disable_thermal_alert(smu);
+	// if (ret) {
+	// 	dev_err(adev->dev, "Fail to disable thermal alert!\n");
+	// 	return ret;
+	// }
 
 	cancel_delayed_work_sync(&smu->swctf_delayed_work);
 

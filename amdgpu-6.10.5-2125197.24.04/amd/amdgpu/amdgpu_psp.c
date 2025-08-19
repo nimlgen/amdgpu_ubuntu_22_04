@@ -710,6 +710,12 @@ psp_cmd_submit_buf(struct psp_context *psp,
 
 	memcpy(&cmd->resp, &psp->cmd_buf_mem->resp, sizeof(struct psp_gfx_resp));
 
+	dev_info(
+		psp->adev->dev,
+		"psp gfx command %s(0x%X)\n",
+		psp_gfx_cmd_name(psp->cmd_buf_mem->cmd_id),
+		psp->cmd_buf_mem->cmd_id);
+
 	/* In some cases, psp response status is not 0 even there is no
 	 * problem while the command is submitted. Some version of PSP FW
 	 * doesn't write 0 to that field.
@@ -777,8 +783,8 @@ static void psp_prep_tmr_cmd_buf(struct psp_context *psp,
 		tmr_pa = amdgpu_gmc_vram_pa(adev, tmr_bo);
 	}
 
-	dev_info(adev->dev, "reserve pa: 0x%llx, mc: 0x%x for PSP TMR\n",
-		 tmr_pa, size);
+	dev_info(adev->dev, "reserve pa: 0x%llx, mc: 0x%llx, size: 0x%x for PSP TMR\n",
+		 tmr_pa, tmr_mc, size);
 
 	if (amdgpu_sriov_vf(psp->adev))
 		cmd->cmd_id = GFX_CMD_ID_SETUP_VMR;
@@ -1045,6 +1051,10 @@ static int psp_rl_load(struct amdgpu_device *adev)
 	cmd->cmd.cmd_load_ip_fw.fw_phy_addr_hi = upper_32_bits(psp->fw_pri_mc_addr);
 	cmd->cmd.cmd_load_ip_fw.fw_size = psp->rl.size_bytes;
 	cmd->cmd.cmd_load_ip_fw.fw_type = GFX_FW_TYPE_REG_LIST;
+
+	dev_info(adev->dev, "Loading RLC firmware from 0x%p to 0x%llx size 0x%x\n",
+			psp->rl.start_addr, psp->fw_pri_mc_addr,
+			psp->rl.size_bytes);
 
 	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
 
@@ -2736,6 +2746,10 @@ static int psp_prep_load_ip_fw_cmd_buf(struct psp_context *psp,
 	cmd->cmd.cmd_load_ip_fw.fw_phy_addr_hi = upper_32_bits(fw_mem_mc_addr);
 	cmd->cmd.cmd_load_ip_fw.fw_size = ucode->ucode_size;
 
+	dev_info(psp->adev->dev, "PSP load IP firmware %s(0x%X) size %u bytes\n",
+		 amdgpu_ucode_name(ucode->ucode_id), ucode->ucode_id,
+		 ucode->ucode_size);
+
 	ret = psp_get_fw_type(ucode, &cmd->cmd.cmd_load_ip_fw.fw_type);
 	if (ret)
 		dev_err(psp->adev->dev, "Unknown firmware type\n");
@@ -2984,32 +2998,32 @@ static int psp_load_fw(struct amdgpu_device *adev)
 		}
 	}
 
-	if (psp->ta_fw) {
-		ret = psp_ras_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"RAS: Failed to initialize RAS\n");
+	// if (psp->ta_fw) {
+	// 	ret = psp_ras_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"RAS: Failed to initialize RAS\n");
 
-		ret = psp_hdcp_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"HDCP: Failed to initialize HDCP\n");
+	// 	ret = psp_hdcp_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"HDCP: Failed to initialize HDCP\n");
 
-		ret = psp_dtm_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"DTM: Failed to initialize DTM\n");
+	// 	ret = psp_dtm_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"DTM: Failed to initialize DTM\n");
 
-		ret = psp_rap_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"RAP: Failed to initialize RAP\n");
+	// 	ret = psp_rap_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"RAP: Failed to initialize RAP\n");
 
-		ret = psp_securedisplay_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"SECUREDISPLAY: Failed to initialize SECUREDISPLAY\n");
-	}
+	// 	ret = psp_securedisplay_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"SECUREDISPLAY: Failed to initialize SECUREDISPLAY\n");
+	// }
 
 	return 0;
 
@@ -3189,32 +3203,32 @@ static int psp_resume(struct amdgpu_ip_block *ip_block)
 				"XGMI: Failed to initialize XGMI session\n");
 	}
 
-	if (psp->ta_fw) {
-		ret = psp_ras_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"RAS: Failed to initialize RAS\n");
+	// if (psp->ta_fw) {
+	// 	ret = psp_ras_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"RAS: Failed to initialize RAS\n");
 
-		ret = psp_hdcp_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"HDCP: Failed to initialize HDCP\n");
+	// 	ret = psp_hdcp_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"HDCP: Failed to initialize HDCP\n");
 
-		ret = psp_dtm_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"DTM: Failed to initialize DTM\n");
+	// 	ret = psp_dtm_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"DTM: Failed to initialize DTM\n");
 
-		ret = psp_rap_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"RAP: Failed to initialize RAP\n");
+	// 	ret = psp_rap_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"RAP: Failed to initialize RAP\n");
 
-		ret = psp_securedisplay_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"SECUREDISPLAY: Failed to initialize SECUREDISPLAY\n");
-	}
+	// 	ret = psp_securedisplay_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"SECUREDISPLAY: Failed to initialize SECUREDISPLAY\n");
+	// }
 
 	mutex_unlock(&adev->firmware.mutex);
 

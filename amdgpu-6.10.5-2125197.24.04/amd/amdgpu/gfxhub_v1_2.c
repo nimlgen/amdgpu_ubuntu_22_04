@@ -141,7 +141,7 @@ gfxhub_v1_2_xcc_init_system_aperture_regs(struct amdgpu_device *adev,
 
 			if (adev->apu_flags & (AMD_APU_IS_RAVEN2 |
 					       AMD_APU_IS_RENOIR |
-					       AMD_APU_IS_GREEN_SARDINE))
+					       AMD_APU_IS_GREEN_SARDINE)) {
 			       /*
 				* Raven2 has a HW issue that it is unable to use the
 				* vram which is out of MC_VM_SYSTEM_APERTURE_HIGH_ADDR.
@@ -149,14 +149,22 @@ gfxhub_v1_2_xcc_init_system_aperture_regs(struct amdgpu_device *adev,
 				* aperture high address (add 1) to get rid of the VM
 				* fault and hardware hang.
 				*/
+				dev_info(adev->dev,
+					"buggy MC_VM_SYSTEM_APERTURE_HIGH_ADDR: 0x%X 0x%X\n",
+					adev->gmc.fb_end, adev->gmc.agp_end);
 				WREG32_SOC15_RLC(GC, GET_INST(GC, i),
 						 regMC_VM_SYSTEM_APERTURE_HIGH_ADDR,
 						 max((adev->gmc.fb_end >> 18) + 0x1,
 						     adev->gmc.agp_end >> 18));
-			else
+			} else {
+				dev_info(adev->dev,
+					"MC_VM_SYSTEM_APERTURE_HIGH_ADDR: 0x%llx 0x%llx 0x%llx\n",
+					adev->gmc.fb_end, adev->gmc.agp_end,
+					max(adev->gmc.fb_end, adev->gmc.agp_end) >> 18);
 				WREG32_SOC15_RLC(GC, GET_INST(GC, i),
 					regMC_VM_SYSTEM_APERTURE_HIGH_ADDR,
 					max(adev->gmc.fb_end, adev->gmc.agp_end) >> 18);
+			}
 
 			/* Set default page address. */
 			value = amdgpu_gmc_vram_mc2pa(adev, adev->mem_scratch.gpu_addr);
@@ -514,6 +522,7 @@ static void gfxhub_v1_2_xcc_set_fault_enable_default(struct amdgpu_device *adev,
 			tmp = REG_SET_FIELD(tmp, VM_L2_PROTECTION_FAULT_CNTL,
 					CRASH_ON_RETRY_FAULT, 1);
 		}
+		dev_info(adev->dev, "gfxhub %d %d set fault enable default %d\n", i, GET_INST(GC, i), tmp);
 		WREG32_SOC15(GC, GET_INST(GC, i), regVM_L2_PROTECTION_FAULT_CNTL, tmp);
 	}
 }
@@ -579,6 +588,7 @@ static void gfxhub_v1_2_init(struct amdgpu_device *adev)
 	uint32_t xcc_mask;
 
 	xcc_mask = GENMASK(NUM_XCC(adev->gfx.xcc_mask) - 1, 0);
+	dev_info(adev->dev, "gfxhub v1.2 %d %d\n", (int)NUM_XCC(adev->gfx.xcc_mask), (int)xcc_mask);
 	gfxhub_v1_2_xcc_init(adev, xcc_mask);
 }
 

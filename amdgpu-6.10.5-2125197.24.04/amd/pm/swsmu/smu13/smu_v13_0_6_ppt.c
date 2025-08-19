@@ -317,7 +317,7 @@ static int smu_v13_0_6_init_microcode(struct smu_context *smu)
 	p2stable_count = le32_to_cpu(v2_1->pptable_count);
 	for (i = 0; i < p2stable_count; i++) {
 		if (le32_to_cpu(entries[i].id) == p2s_table_id) {
-			dev_info(adev->dev, "Found P2S table %d\n", i);
+			dev_info(adev->dev, "Found P2S table 0x%x 0x%x 0x%x\n", entries[i].ppt_offset_bytes, entries[i].ppt_size_bytes);
 			smu->pptable_firmware.data =
 				((uint8_t *)v2_1 +
 				 le32_to_cpu(entries[i].ppt_offset_bytes));
