@@ -1615,10 +1615,11 @@ static int gfx_v9_4_3_xcc_rlc_resume(struct amdgpu_device *adev, int xcc_id)
 		gfx_v9_4_3_xcc_rlc_start(adev, xcc_id);
 	}
 
+	dev_info(adev->dev, "RLC is resuming 2...\n");
 	amdgpu_gfx_rlc_enter_safe_mode(adev, xcc_id);
 	/* disable CG */
 	WREG32_SOC15(GC, GET_INST(GC, xcc_id), regRLC_CGCG_CGLS_CTRL, 0);
-	gfx_v9_4_3_xcc_init_pg(adev, xcc_id);
+	// gfx_v9_4_3_xcc_init_pg(adev, xcc_id);
 	amdgpu_gfx_rlc_exit_safe_mode(adev, xcc_id);
 
 	return 0;
@@ -1631,6 +1632,7 @@ static int gfx_v9_4_3_rlc_resume(struct amdgpu_device *adev)
 	if (amdgpu_sriov_vf(adev))
 		return 0;
 
+	dev_info(adev->dev, "RLC is resuming...\n");
 	num_xcc = NUM_XCC(adev->gfx.xcc_mask);
 	for (i = 0; i < num_xcc; i++) {
 		r = gfx_v9_4_3_xcc_rlc_resume(adev, i);
@@ -1779,12 +1781,12 @@ static void gfx_v9_4_3_xcc_kiq_setting(struct amdgpu_ring *ring, int xcc_id)
 	struct amdgpu_device *adev = ring->adev;
 
 	/* tell RLC which is KIQ queue */
-	tmp = RREG32_SOC15(GC, GET_INST(GC, xcc_id), regRLC_CP_SCHEDULERS);
-	tmp &= 0xffffff00;
-	tmp |= (ring->me << 5) | (ring->pipe << 3) | (ring->queue);
-	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regRLC_CP_SCHEDULERS, tmp);
-	tmp |= 0x80;
-	WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regRLC_CP_SCHEDULERS, tmp);
+	// tmp = RREG32_SOC15(GC, GET_INST(GC, xcc_id), regRLC_CP_SCHEDULERS);
+	// tmp &= 0xffffff00;
+	// tmp |= (ring->me << 5) | (ring->pipe << 3) | (ring->queue);
+	// WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regRLC_CP_SCHEDULERS, tmp);
+	// tmp |= 0x80;
+	// WREG32_SOC15_RLC(GC, GET_INST(GC, xcc_id), regRLC_CP_SCHEDULERS, tmp);
 }
 
 static void gfx_v9_4_3_mqd_set_priority(struct amdgpu_ring *ring, struct v9_mqd *mqd)
@@ -2091,7 +2093,7 @@ static int gfx_v9_4_3_xcc_kiq_init_queue(struct amdgpu_ring *ring, int xcc_id)
 	struct v9_mqd *mqd = ring->mqd_ptr;
 	struct v9_mqd *tmp_mqd;
 
-	gfx_v9_4_3_xcc_kiq_setting(ring, xcc_id);
+	// gfx_v9_4_3_xcc_kiq_setting(ring, xcc_id);
 
 	/* GPU could be in bad state during probe, driver trigger the reset
 	 * after load the SMU, in this case , the mqd is not be initialized.

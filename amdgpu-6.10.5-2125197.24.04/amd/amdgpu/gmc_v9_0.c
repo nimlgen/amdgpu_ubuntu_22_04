@@ -1118,6 +1118,8 @@ static void gmc_v9_0_get_vm_pde(struct amdgpu_device *adev, int level,
 			*flags |= AMDGPU_PTE_TF;
 		}
 	}
+
+	dev_info(adev->dev, "\t\tpde: level=%d, addr=0x%llx, flags=0x%llx\n", level, *addr, *flags);
 }
 
 static void gmc_v9_0_get_coherence_flags(struct amdgpu_device *adev,
@@ -1256,6 +1258,8 @@ static void gmc_v9_0_get_vm_pte(struct amdgpu_device *adev,
 	if (bo && bo->tbo.resource)
 		gmc_v9_0_get_coherence_flags(adev, mapping->bo_va->base.bo,
 					     mapping, flags);
+
+	dev_info(adev->dev, "\t\tpte: flags=0x%llx\n", *flags);
 }
 
 static void gmc_v9_0_override_vm_pte_flags(struct amdgpu_device *adev,
@@ -2165,6 +2169,8 @@ static int gmc_v9_0_sw_init(struct amdgpu_ip_block *ip_block)
 
 		amdgpu_vm_adjust_size(adev, 256 * 1024, 9, 3, 48);
 		adev->gmc.translate_further = adev->vm_manager.num_level > 1;
+		dev_info(adev->dev, "vm_manager.num_level: %d %d\n",
+			(int)adev->vm_manager.num_level, (int)adev->gmc.translate_further);
 		break;
 	default:
 		break;

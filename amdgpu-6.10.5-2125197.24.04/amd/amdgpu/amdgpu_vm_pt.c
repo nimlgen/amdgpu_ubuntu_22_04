@@ -667,6 +667,8 @@ int amdgpu_vm_pde_update(struct amdgpu_vm_update_params *params,
 	level += params->adev->vm_manager.root_level;
 	amdgpu_gmc_get_pde_for_bo(entry->bo, level, &pt, &flags);
 	pde = (entry - to_amdgpu_bo_vm(parent->bo)->entries) * 8;
+	dev_info(params->adev->dev, "\t\tamdgpu_vm_pde_update: level=0x%x pde=0x%llx pt=0x%llx flags=0x%llx\n",
+		 level, pde, pt, flags);
 	return vm->update_funcs->update(params, to_amdgpu_bo_vm(bo), pde, pt,
 					1, 0, flags);
 }
@@ -830,6 +832,8 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 	amdgpu_vm_pte_fragment(params, frag_start, end, flags, &frag,
 			       &frag_end);
 
+	dev_info(adev->dev, "amdgpu_vm_ptes_update: size=0x%llx start=0x%llx dst=0x%llx\n", end-start, start, dst);
+
 	/* walk over the address space and update the PTs */
 	amdgpu_vm_pt_start(adev, params->vm, start, &cursor);
 	while (cursor.pfn < end) {
@@ -925,6 +929,8 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 
 			pe_start += nptes * 8;
 			dst += nptes * incr;
+
+			dev_info(adev->dev, "\tnptes=0x%x incr=0x%llx upd_flags=0x%llx frags=0x%llx\n", nptes, incr, upd_flags, frag);
 
 			frag_start = upd_end;
 			if (frag_start >= frag_end) {
