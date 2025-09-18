@@ -2165,6 +2165,7 @@ static int gmc_v9_0_sw_init(struct amdgpu_ip_block *ip_block)
 
 		inst_mask <<= AMDGPU_MMHUB0(0);
 		dev_info(adev->dev, "MMHUB mask: 0x%lx\n", inst_mask);
+		inst_mask = 0xf00;
 		bitmap_or(adev->vmhubs_mask, adev->vmhubs_mask, &inst_mask, 32);
 
 		amdgpu_vm_adjust_size(adev, 256 * 1024, 9, 3, 48);

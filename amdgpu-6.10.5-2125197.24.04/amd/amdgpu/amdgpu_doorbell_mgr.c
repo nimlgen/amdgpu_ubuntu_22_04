@@ -102,6 +102,8 @@ void amdgpu_mm_wdoorbell64(struct amdgpu_device *adev, u32 index, u64 v)
 	if (amdgpu_device_skip_hw_access(adev))
 		return;
 
+	dev_info(adev->dev, "doorbell index %d value 0x%016llx\n", index, v);
+	
 	if (index < adev->doorbell.num_kernel_doorbells)
 		atomic64_set((atomic64_t *)(adev->doorbell.cpu_addr + index), v);
 	else

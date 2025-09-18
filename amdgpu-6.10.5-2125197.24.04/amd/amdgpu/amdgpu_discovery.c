@@ -1406,7 +1406,7 @@ static int amdgpu_discovery_reg_base_init(struct amdgpu_device *adev)
 				adev->umc.node_inst_num++;
 			}
 
-			if (le16_to_cpu(ip->hw_id) == GC_HWID)
+			if (le16_to_cpu(ip->hw_id) == GC_HWID && ip->instance_number == 0)
 				adev->gfx.xcc_mask |=
 					(1U << ip->instance_number);
 

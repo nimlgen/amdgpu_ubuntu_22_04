@@ -2320,7 +2320,7 @@ void amdgpu_vm_adjust_size(struct amdgpu_device *adev, uint32_t min_vm_size,
 	else
 		adev->vm_manager.fragment_size = amdgpu_vm_fragment_size;
 
-	DRM_INFO("vm size is %u GB, %u levels, block size is %u-bit, fragment size is %u-bit\n",
+	DRM_ERROR("vm size is %u GB, %u levels, block size is %u-bit, fragment size is %u-bit\n",
 		 vm_size, adev->vm_manager.num_level + 1,
 		 adev->vm_manager.block_size,
 		 adev->vm_manager.fragment_size);
