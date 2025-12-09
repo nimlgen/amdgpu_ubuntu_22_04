@@ -715,6 +715,12 @@ bool amdgpu_device_skip_hw_access(struct amdgpu_device *adev)
 	return false;
 }
 
+int _reg_logs = 1;
+uint32_t pref_r_reg = 0;
+uint32_t pref_w_reg = 0;
+uint32_t pref_w_v = 0xdeadc0de;
+uint32_t pref_r_reg_vv = 0xdeadc0de;
+
 /**
  * amdgpu_device_rreg - read a memory mapped IO or indirect register
  *
@@ -744,6 +750,10 @@ uint32_t amdgpu_device_rreg(struct amdgpu_device *adev,
 	} else {
 		ret = adev->pcie_rreg(adev, reg * 4);
 	}
+
+	if (_reg_logs && (pref_r_reg != reg || pref_r_reg_vv != ret)) dev_info(adev->dev, "Reading register 0x%x with value 0x%x\n", reg, ret);
+	pref_r_reg = reg;
+	pref_r_reg_vv = ret;
 
 	trace_amdgpu_device_rreg(adev->pdev->device, reg, ret);
 
@@ -792,6 +802,8 @@ uint32_t amdgpu_device_xcc_rreg(struct amdgpu_device *adev,
 
 	if (amdgpu_device_skip_hw_access(adev))
 		return 0;
+
+	dev_info(adev->dev, "XCC Reading register 0x%x\n", reg);
 
 	if ((reg * 4) < adev->rmmio_size) {
 		if (amdgpu_sriov_vf(adev) &&
@@ -859,6 +871,8 @@ void amdgpu_device_wreg(struct amdgpu_device *adev,
 	if (amdgpu_device_skip_hw_access(adev))
 		return;
 
+	if (reg == 0x404cd01 || reg == 0xde0) dump_stack();
+	if (_reg_logs) dev_info(adev->dev, "Writing register 0x%x with value 0x%x\n", reg, v);
 	if ((reg * 4) < adev->rmmio_size) {
 		if (!(acc_flags & AMDGPU_REGS_NO_KIQ) &&
 		    amdgpu_sriov_runtime(adev) &&
@@ -872,6 +886,8 @@ void amdgpu_device_wreg(struct amdgpu_device *adev,
 		adev->pcie_wreg(adev, reg * 4, v);
 	}
 
+	pref_w_v = v;
+	pref_w_reg = reg;
 	trace_amdgpu_device_wreg(adev->pdev->device, reg, v);
 }
 
@@ -891,6 +907,8 @@ void amdgpu_mm_wreg_mmio_rlc(struct amdgpu_device *adev,
 {
 	if (amdgpu_device_skip_hw_access(adev))
 		return;
+
+	dev_info(adev->dev, "RLC/MMIO Writing register 0x%x with value 0x%x\n", reg, v);
 
 	if (amdgpu_sriov_fullaccess(adev) &&
 	    adev->gfx.rlc.funcs &&
@@ -923,6 +941,8 @@ void amdgpu_device_xcc_wreg(struct amdgpu_device *adev,
 
 	if (amdgpu_device_skip_hw_access(adev))
 		return;
+
+	dev_info(adev->dev, "XCC Writing register 0x%x with value 0x%x\n", reg, v);
 
 	if ((reg * 4) < adev->rmmio_size) {
 		if (amdgpu_sriov_vf(adev) &&

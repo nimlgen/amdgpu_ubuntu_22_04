@@ -234,7 +234,7 @@ uint amdgpu_freesync_vid_mode;
 int amdgpu_reset_method = -1; /* auto */
 int amdgpu_num_kcq = -1;
 int amdgpu_smartshift_bias;
-int amdgpu_use_xgmi_p2p = 1;
+int amdgpu_use_xgmi_p2p = 0;
 int amdgpu_vcnfw_log;
 int amdgpu_sg_display = -1; /* auto */
 int amdgpu_user_partt_mode = AMDGPU_AUTO_COMPUTE_PARTITION_MODE;
@@ -2334,6 +2334,10 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
 	unsigned long flags = ent->driver_data;
 	int ret, retry = 0, i;
 	bool supports_atomic = false;
+
+	if (memcmp(pci_name(pdev), "0000:e5:00.0", 12)) {
+		return -ENODEV;
+	}
 
 	if ((pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA ||
 	    (pdev->class >> 8) == PCI_CLASS_DISPLAY_OTHER) {
