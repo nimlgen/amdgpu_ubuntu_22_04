@@ -12,60 +12,62 @@ sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp
 
 sudo dmesg -C
 
-sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdttm.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdkcl.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amd-sched.ko.zst                                                      
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdgpu.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdxcp.ko.zst 
+sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdttm.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdkcl.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amd-sched.ko.zst                                                      
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdgpu.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdxcp.ko.zst 
 
-sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdttm.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdkcl.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amd-sched.ko.zst                                                      
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdgpu.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdxcp.ko.zst 
+sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdttm.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdkcl.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amd-sched.ko.zst                                                      
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdgpu.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdxcp.ko.zst 
 
-sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdttm.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdkcl.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amd-sched.ko.zst                                                      
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdgpu.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdxcp.ko.zst 
+sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdttm.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdkcl.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amd-sched.ko.zst                                                      
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdgpu.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdxcp.ko.zst 
 
-sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdttm.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdkcl.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amd-sched.ko.zst                                                      
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdgpu.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdxcp.ko.zst 
+sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdttm.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdkcl.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amd-sched.ko.zst                                                      
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdgpu.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdxcp.ko.zst 
 
-sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdttm.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdkcl.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amd-sched.ko.zst                                                      
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdgpu.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdxcp.ko.zst 
+sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdttm.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdkcl.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amd-sched.ko.zst                                                      
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdgpu.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdxcp.ko.zst 
 
-sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdttm.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdkcl.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amd-sched.ko.zst                                                      
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdgpu.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdxcp.ko.zst 
+sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdttm.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdkcl.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amd-sched.ko.zst                                                      
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdgpu.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdxcp.ko.zst 
 
-sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdttm.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdkcl.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amd-sched.ko.zst                                                      
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdgpu.ko.zst                                                         
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
-sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-78-generic/x86_64/module/amdxcp.ko.zst 
+sudo insmod /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdttm.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdkcl.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amd-sched.ko.zst                                                      
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdgpu.ko.zst                                                         
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_ttm_helper.ko.zst                                              
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amddrm_buddy.ko.zst                                                   
+sudo insmod  /home/nimlgen/amdgpu_ubuntu_22_04/build_60301/amdgpu/6.10.5-2125197.24.04/6.8.0-88-generic/x86_64/module/amdxcp.ko.zst 
 
 sudo dmesg -c > x.x
+
+PYTHONPATH=/home/nimlgen/tinygrad python3 '/home/nimlgen/tinygrad/extra/amdpci/proclogs.py' /home/nimlgen/amdgpu_ubuntu_22_04/x.x /home/nimlgen/amdgpu_ubuntu_22_04/cx.x
