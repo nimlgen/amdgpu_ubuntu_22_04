@@ -3197,30 +3197,30 @@ static int amdgpu_device_ip_init(struct amdgpu_device *adev)
 	/**
 	 * In case of XGMI grab extra reference for reset domain for this device
 	 */
-	if (adev->gmc.xgmi.num_physical_nodes > 1) {
-		if (amdgpu_xgmi_add_device(adev) == 0) {
-			if (!amdgpu_sriov_vf(adev)) {
-				struct amdgpu_hive_info *hive = amdgpu_get_xgmi_hive(adev);
+	// if (adev->gmc.xgmi.num_physical_nodes > 1) {
+	// 	if (amdgpu_xgmi_add_device(adev) == 0) {
+	// 		if (!amdgpu_sriov_vf(adev)) {
+	// 			struct amdgpu_hive_info *hive = amdgpu_get_xgmi_hive(adev);
 
-				if (WARN_ON(!hive)) {
-					r = -ENOENT;
-					goto init_failed;
-				}
+	// 			if (WARN_ON(!hive)) {
+	// 				r = -ENOENT;
+	// 				goto init_failed;
+	// 			}
 
-				if (!hive->reset_domain ||
-				    !amdgpu_reset_get_reset_domain(hive->reset_domain)) {
-					r = -ENOENT;
-					amdgpu_put_xgmi_hive(hive);
-					goto init_failed;
-				}
+	// 			if (!hive->reset_domain ||
+	// 			    !amdgpu_reset_get_reset_domain(hive->reset_domain)) {
+	// 				r = -ENOENT;
+	// 				amdgpu_put_xgmi_hive(hive);
+	// 				goto init_failed;
+	// 			}
 
-				/* Drop the early temporary reset domain we created for device */
-				amdgpu_reset_put_reset_domain(adev->reset_domain);
-				adev->reset_domain = hive->reset_domain;
-				amdgpu_put_xgmi_hive(hive);
-			}
-		}
-	}
+	// 			/* Drop the early temporary reset domain we created for device */
+	// 			amdgpu_reset_put_reset_domain(adev->reset_domain);
+	// 			adev->reset_domain = hive->reset_domain;
+	// 			amdgpu_put_xgmi_hive(hive);
+	// 		}
+	// 	}
+	// }
 
 	r = amdgpu_device_init_schedulers(adev);
 	if (r)
@@ -5893,9 +5893,9 @@ int amdgpu_device_reinit_after_reset(struct amdgpu_reset_context *reset_context)
 				 */
 				amdgpu_register_gpu_instance(tmp_adev);
 
-				if (!reset_context->hive &&
-				    tmp_adev->gmc.xgmi.num_physical_nodes > 1)
-					amdgpu_xgmi_add_device(tmp_adev);
+				// if (!reset_context->hive &&
+				//     tmp_adev->gmc.xgmi.num_physical_nodes > 1)
+				// 	amdgpu_xgmi_add_device(tmp_adev);
 
 				r = amdgpu_device_ip_late_init(tmp_adev);
 				if (r)

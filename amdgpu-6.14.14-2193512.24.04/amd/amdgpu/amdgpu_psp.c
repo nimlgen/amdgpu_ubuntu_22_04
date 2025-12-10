@@ -1464,6 +1464,8 @@ int psp_xgmi_initialize(struct psp_context *psp, bool set_extended_data, bool lo
 			return ret;
 	}
 
+	dev_info(psp->adev->dev, "PSP: XGMI TA initialize\n");
+
 	/* Load XGMI TA */
 	ret = psp_ta_load(psp, &psp->xgmi_context.context);
 	if (!ret)
@@ -3353,15 +3355,15 @@ static int psp_resume(struct amdgpu_ip_block *ip_block)
 		goto failed;
 	}
 
-	if (adev->gmc.xgmi.num_physical_nodes > 1) {
-		ret = psp_xgmi_initialize(psp, false, true);
-		/* Warning the XGMI seesion initialize failure
-		 * Instead of stop driver initialization
-		 */
-		if (ret)
-			dev_err(psp->adev->dev,
-				"XGMI: Failed to initialize XGMI session\n");
-	}
+	// if (adev->gmc.xgmi.num_physical_nodes > 1) {
+	// 	ret = psp_xgmi_initialize(psp, false, true);
+	// 	/* Warning the XGMI seesion initialize failure
+	// 	 * Instead of stop driver initialization
+	// 	 */
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"XGMI: Failed to initialize XGMI session\n");
+	// }
 
 	if (psp->ta_fw) {
 		ret = psp_ras_initialize(psp);
