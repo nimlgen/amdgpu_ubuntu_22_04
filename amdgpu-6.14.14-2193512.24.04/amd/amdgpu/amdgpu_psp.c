@@ -829,6 +829,8 @@ static int psp_load_toc(struct psp_context *psp,
 
 	psp_prep_load_toc_cmd_buf(cmd, psp->fw_pri_mc_addr, psp->toc.size_bytes);
 
+	dev_info(psp->adev->dev, "PSP: load toc to PSP\n");
+
 	ret = psp_cmd_submit_buf(psp, NULL, cmd,
 				 psp->fence_buf_mc_addr);
 	if (!ret)
@@ -915,6 +917,8 @@ static int psp_tmr_load(struct psp_context *psp)
 
 	cmd = acquire_psp_cmd_buf(psp);
 
+	dev_info(psp->adev->dev, "PSP: setup PSP TMR buffer\n");
+
 	psp_prep_tmr_cmd_buf(psp, cmd, psp->tmr_mc_addr, psp->tmr_bo);
 	if (psp->tmr_bo)
 		dev_info(psp->adev->dev, "reserve 0x%lx from 0x%llx for PSP TMR\n",
@@ -953,6 +957,8 @@ static int psp_tmr_unload(struct psp_context *psp)
 	psp_prep_tmr_unload_cmd_buf(psp, cmd);
 	dev_dbg(psp->adev->dev, "free PSP TMR buffer\n");
 
+	dev_info(psp->adev->dev, "PSP: unload PSP TMR buffer\n");
+
 	ret = psp_cmd_submit_buf(psp, NULL, cmd,
 				 psp->fence_buf_mc_addr);
 
@@ -982,6 +988,8 @@ int psp_get_fw_attestation_records_addr(struct psp_context *psp,
 
 	cmd->cmd_id = GFX_CMD_ID_GET_FW_ATTESTATION;
 
+	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_GET_FW_ATTESTATION\n");
+
 	ret = psp_cmd_submit_buf(psp, NULL, cmd,
 				 psp->fence_buf_mc_addr);
 
@@ -1007,6 +1015,8 @@ static int psp_get_fw_reservation_info(struct psp_context *psp,
 	cmd = acquire_psp_cmd_buf(psp);
 
 	cmd->cmd_id = cmd_id;
+
+	dev_info(psp->adev->dev, "PSP: cmd_id 0x%x\n", cmd_id);
 
 	ret = psp_cmd_submit_buf(psp, NULL, cmd,
 				 psp->fence_buf_mc_addr);
@@ -1096,6 +1106,8 @@ static int psp_boot_config_get(struct amdgpu_device *adev, uint32_t *boot_cfg)
 	cmd->cmd_id = GFX_CMD_ID_BOOT_CFG;
 	cmd->cmd.boot_cfg.sub_cmd = BOOTCFG_CMD_GET;
 
+	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_BOOT_CFG\n");
+
 	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
 	if (!ret) {
 		*boot_cfg =
@@ -1122,6 +1134,8 @@ static int psp_boot_config_set(struct amdgpu_device *adev, uint32_t boot_cfg)
 	cmd->cmd.boot_cfg.sub_cmd = BOOTCFG_CMD_SET;
 	cmd->cmd.boot_cfg.boot_config = boot_cfg;
 	cmd->cmd.boot_cfg.boot_config_valid = boot_cfg;
+
+	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_BOOT_CFG\n");
 
 	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
 
@@ -1150,6 +1164,8 @@ static int psp_rl_load(struct amdgpu_device *adev)
 	cmd->cmd.cmd_load_ip_fw.fw_size = psp->rl.size_bytes;
 	cmd->cmd.cmd_load_ip_fw.fw_type = GFX_FW_TYPE_REG_LIST;
 
+	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_LOAD_IP_FW\n");
+
 	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
 
 	release_psp_cmd_buf(psp);
@@ -1169,6 +1185,8 @@ int psp_memory_partition(struct psp_context *psp, int mode)
 
 	cmd->cmd_id = GFX_CMD_ID_FB_NPS_MODE;
 	cmd->cmd.cmd_memory_part.mode = mode;
+
+	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_FB_NPS_MODE\n");
 
 	dev_info(psp->adev->dev,
 		 "Requesting %d memory partition change through PSP", mode);
@@ -1194,6 +1212,8 @@ int psp_spatial_partition(struct psp_context *psp, int mode)
 
 	cmd->cmd_id = GFX_CMD_ID_SRIOV_SPATIAL_PART;
 	cmd->cmd.cmd_spatial_part.mode = mode;
+
+	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_SRIOV_SPATIAL_PART\n");
 
 	dev_info(psp->adev->dev, "Requesting %d partitions through PSP", mode);
 	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
@@ -1244,6 +1264,8 @@ int psp_ta_unload(struct psp_context *psp, struct ta_context *context)
 
 	psp_prep_ta_unload_cmd_buf(cmd, context->session_id);
 
+	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_UNLOAD_TA\n");
+
 	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
 
 	context->resp_status = cmd->resp.status;
@@ -1288,6 +1310,8 @@ int psp_reg_program(struct psp_context *psp, enum psp_reg_prog_id reg,
 		return -EINVAL;
 
 	cmd = acquire_psp_cmd_buf(psp);
+
+	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_PROG_REG\n");
 
 	psp_prep_reg_prog_cmd_buf(cmd, reg, value);
 	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
@@ -1348,6 +1372,8 @@ int psp_ta_invoke(struct psp_context *psp,
 
 	psp_prep_ta_invoke_cmd_buf(cmd, ta_cmd_id, context->session_id);
 
+	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_INVOKE_CMD\n");
+
 	ret = psp_cmd_submit_buf(psp, NULL, cmd,
 				 psp->fence_buf_mc_addr);
 
@@ -1374,6 +1400,8 @@ int psp_ta_load(struct psp_context *psp, struct ta_context *context)
 			amdgpu_bo_fb_aper_addr(context->mem_context.shared_bo);
 
 	psp_prep_ta_load_cmd_buf(cmd, psp->fw_pri_mc_addr, context);
+
+	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_LOAD_TA\n");
 
 	ret = psp_cmd_submit_buf(psp, NULL, cmd,
 				 psp->fence_buf_mc_addr);
@@ -3392,6 +3420,7 @@ int psp_rlc_autoload_start(struct psp_context *psp)
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
 
 	cmd->cmd_id = GFX_CMD_ID_AUTOLOAD_RLC;
+	dev_info(psp->adev->dev, "PSP start RLC autoload\n");
 
 	ret = psp_cmd_submit_buf(psp, NULL, cmd,
 				 psp->fence_buf_mc_addr);
@@ -4028,6 +4057,9 @@ int psp_config_sq_perfmon(struct psp_context *psp,
 	cmd->cmd.config_sq_perfmon.core_override	=	core_override_enable;
 	cmd->cmd.config_sq_perfmon.reg_override	=	reg_override_enable;
 	cmd->cmd.config_sq_perfmon.perfmon_override = perfmon_override_enable;
+
+	dev_info(psp->adev->dev, "PSP CONFIG_SQ_PERFMON: xcc%d core%d reg%d perfmon%d\n",
+		xcc_id, core_override_enable, reg_override_enable, perfmon_override_enable);
 
 	ret = psp_cmd_submit_buf(psp, NULL, cmd, psp->fence_buf_mc_addr);
 	if (ret)
