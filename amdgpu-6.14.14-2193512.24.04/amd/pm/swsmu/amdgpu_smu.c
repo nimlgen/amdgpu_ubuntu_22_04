@@ -1641,11 +1641,11 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		break;
 	}
 
-	ret = smu_init_display_count(smu, 0);
-	if (ret) {
-		dev_info(adev->dev, "Failed to pre-set display count as 0!\n");
-		return ret;
-	}
+	// ret = smu_init_display_count(smu, 0);
+	// if (ret) {
+	// 	dev_info(adev->dev, "Failed to pre-set display count as 0!\n");
+	// 	return ret;
+	// }
 
 	ret = smu_set_driver_table_location(smu);
 	if (ret) {
@@ -1666,24 +1666,24 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 	 * Use msg SetSystemVirtualDramAddr and DramLogSetDramAddr can notify
 	 * pool location.
 	 */
-	ret = smu_notify_memory_pool_location(smu);
-	if (ret) {
-		dev_err(adev->dev, "Failed to SetDramLogDramAddr!\n");
-		return ret;
-	}
+	// ret = smu_notify_memory_pool_location(smu);
+	// if (ret) {
+	// 	dev_err(adev->dev, "Failed to SetDramLogDramAddr!\n");
+	// 	return ret;
+	// }
 
 	/*
 	 * It is assumed the pptable used before runpm is same as
 	 * the one used afterwards. Thus, we can reuse the stored
 	 * copy and do not need to resetup the pptable again.
 	 */
-	if (!adev->in_runpm) {
-		ret = smu_setup_pptable(smu);
-		if (ret) {
-			dev_err(adev->dev, "Failed to setup pptable!\n");
-			return ret;
-		}
-	}
+	// if (!adev->in_runpm) {
+	// 	ret = smu_setup_pptable(smu);
+	// 	if (ret) {
+	// 		dev_err(adev->dev, "Failed to setup pptable!\n");
+	// 		return ret;
+	// 	}
+	// }
 
 	/* smu_dump_pptable(smu); */
 
@@ -1691,17 +1691,17 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 	 * With SCPM enabled, PSP is responsible for the PPTable transferring
 	 * (to SMU). Driver involvement is not needed and permitted.
 	 */
-	if (!adev->scpm_enabled) {
-		/*
-		 * Copy pptable bo in the vram to smc with SMU MSGs such as
-		 * SetDriverDramAddr and TransferTableDram2Smu.
-		 */
-		ret = smu_write_pptable(smu);
-		if (ret) {
-			dev_err(adev->dev, "Failed to transfer pptable to SMC!\n");
-			return ret;
-		}
-	}
+	// if (!adev->scpm_enabled) {
+	// 	/*
+	// 	 * Copy pptable bo in the vram to smc with SMU MSGs such as
+	// 	 * SetDriverDramAddr and TransferTableDram2Smu.
+	// 	 */
+	// 	ret = smu_write_pptable(smu);
+	// 	if (ret) {
+	// 		dev_err(adev->dev, "Failed to transfer pptable to SMC!\n");
+	// 		return ret;
+	// 	}
+	// }
 
 	/* issue Run*Btc msg */
 	ret = smu_run_btc(smu);
@@ -1729,40 +1729,40 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		}
 	}
 
-	if (adev->pm.pcie_gen_mask & CAIL_PCIE_LINK_SPEED_SUPPORT_GEN5)
-		pcie_gen = 4;
-	else if (adev->pm.pcie_gen_mask & CAIL_PCIE_LINK_SPEED_SUPPORT_GEN4)
-		pcie_gen = 3;
-	else if (adev->pm.pcie_gen_mask & CAIL_PCIE_LINK_SPEED_SUPPORT_GEN3)
-		pcie_gen = 2;
-	else if (adev->pm.pcie_gen_mask & CAIL_PCIE_LINK_SPEED_SUPPORT_GEN2)
-		pcie_gen = 1;
-	else if (adev->pm.pcie_gen_mask & CAIL_PCIE_LINK_SPEED_SUPPORT_GEN1)
-		pcie_gen = 0;
+	// if (adev->pm.pcie_gen_mask & CAIL_PCIE_LINK_SPEED_SUPPORT_GEN5)
+	// 	pcie_gen = 4;
+	// else if (adev->pm.pcie_gen_mask & CAIL_PCIE_LINK_SPEED_SUPPORT_GEN4)
+	// 	pcie_gen = 3;
+	// else if (adev->pm.pcie_gen_mask & CAIL_PCIE_LINK_SPEED_SUPPORT_GEN3)
+	// 	pcie_gen = 2;
+	// else if (adev->pm.pcie_gen_mask & CAIL_PCIE_LINK_SPEED_SUPPORT_GEN2)
+	// 	pcie_gen = 1;
+	// else if (adev->pm.pcie_gen_mask & CAIL_PCIE_LINK_SPEED_SUPPORT_GEN1)
+	// 	pcie_gen = 0;
 
 	/* Bit 31:16: LCLK DPM level. 0 is DPM0, and 1 is DPM1
 	 * Bit 15:8:  PCIE GEN, 0 to 3 corresponds to GEN1 to GEN4
 	 * Bit 7:0:   PCIE lane width, 1 to 7 corresponds is x1 to x32
 	 */
-	if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X32)
-		pcie_width = 7;
-	else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X16)
-		pcie_width = 6;
-	else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X12)
-		pcie_width = 5;
-	else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X8)
-		pcie_width = 4;
-	else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X4)
-		pcie_width = 3;
-	else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X2)
-		pcie_width = 2;
-	else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X1)
-		pcie_width = 1;
-	ret = smu_update_pcie_parameters(smu, pcie_gen, pcie_width);
-	if (ret) {
-		dev_err(adev->dev, "Attempt to override pcie params failed!\n");
-		return ret;
-	}
+	// if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X32)
+	// 	pcie_width = 7;
+	// else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X16)
+	// 	pcie_width = 6;
+	// else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X12)
+	// 	pcie_width = 5;
+	// else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X8)
+	// 	pcie_width = 4;
+	// else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X4)
+	// 	pcie_width = 3;
+	// else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X2)
+	// 	pcie_width = 2;
+	// else if (adev->pm.pcie_mlw_mask & CAIL_PCIE_LINK_WIDTH_SUPPORT_X1)
+	// 	pcie_width = 1;
+	// ret = smu_update_pcie_parameters(smu, pcie_gen, pcie_width);
+	// if (ret) {
+	// 	dev_err(adev->dev, "Attempt to override pcie params failed!\n");
+	// 	return ret;
+	// }
 
 	ret = smu_system_features_control(smu, true);
 	if (ret) {
@@ -1770,7 +1770,7 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		return ret;
 	}
 
-	smu_init_xgmi_plpd_mode(smu);
+	// smu_init_xgmi_plpd_mode(smu);
 
 	ret = smu_feature_get_enabled_mask(smu, &features_supported);
 	if (ret) {
@@ -1781,53 +1781,53 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 		    (unsigned long *)&features_supported,
 		    feature->feature_num);
 
-	if (!smu_is_dpm_running(smu))
-		dev_info(adev->dev, "dpm has been disabled\n");
+	// if (!smu_is_dpm_running(smu))
+	// 	dev_info(adev->dev, "dpm has been disabled\n");
 
 	/*
 	 * Set initialized values (get from vbios) to dpm tables context such as
 	 * gfxclk, memclk, dcefclk, and etc. And enable the DPM feature for each
 	 * type of clks.
 	 */
-	ret = smu_set_default_dpm_table(smu);
-	if (ret) {
-		dev_err(adev->dev, "Failed to setup default dpm clock tables!\n");
-		return ret;
-	}
+	// ret = smu_set_default_dpm_table(smu);
+	// if (ret) {
+	// 	dev_err(adev->dev, "Failed to setup default dpm clock tables!\n");
+	// 	return ret;
+	// }
 
-	ret = smu_get_thermal_temperature_range(smu);
-	if (ret) {
-		dev_err(adev->dev, "Failed to get thermal temperature ranges!\n");
-		return ret;
-	}
+	// ret = smu_get_thermal_temperature_range(smu);
+	// if (ret) {
+	// 	dev_err(adev->dev, "Failed to get thermal temperature ranges!\n");
+	// 	return ret;
+	// }
 
-	ret = smu_enable_thermal_alert(smu);
-	if (ret) {
-	  dev_err(adev->dev, "Failed to enable thermal alert!\n");
-	  return ret;
-	}
+	// ret = smu_enable_thermal_alert(smu);
+	// if (ret) {
+	//   dev_err(adev->dev, "Failed to enable thermal alert!\n");
+	//   return ret;
+	// }
 
-	ret = smu_notify_display_change(smu);
-	if (ret) {
-		dev_err(adev->dev, "Failed to notify display change!\n");
-		return ret;
-	}
+	// ret = smu_notify_display_change(smu);
+	// if (ret) {
+	// 	dev_err(adev->dev, "Failed to notify display change!\n");
+	// 	return ret;
+	// }
 
 	/*
 	 * Set min deep sleep dce fclk with bootup value from vbios via
 	 * SetMinDeepSleepDcefclk MSG.
 	 */
-	ret = smu_set_min_dcef_deep_sleep(smu,
-					  smu->smu_table.boot_values.dcefclk / 100);
-	if (ret) {
-		dev_err(adev->dev, "Error setting min deepsleep dcefclk\n");
-		return ret;
-	}
+	// ret = smu_set_min_dcef_deep_sleep(smu,
+	// 				  smu->smu_table.boot_values.dcefclk / 100);
+	// if (ret) {
+	// 	dev_err(adev->dev, "Error setting min deepsleep dcefclk\n");
+	// 	return ret;
+	// }
 
-	/* Init wbrf support. Properly setup the notifier */
-	ret = smu_wbrf_init(smu);
-	if (ret)
-		dev_err(adev->dev, "Error during wbrf init call\n");
+	// /* Init wbrf support. Properly setup the notifier */
+	// ret = smu_wbrf_init(smu);
+	// if (ret)
+	// 	dev_err(adev->dev, "Error during wbrf init call\n");
 
 	return ret;
 }
@@ -2059,24 +2059,24 @@ static int smu_smc_hw_cleanup(struct smu_context *smu)
 	struct amdgpu_device *adev = smu->adev;
 	int ret = 0;
 
-	smu_wbrf_fini(smu);
+	// smu_wbrf_fini(smu);
 
-	cancel_work_sync(&smu->throttling_logging_work);
-	cancel_work_sync(&smu->interrupt_work);
+	// cancel_work_sync(&smu->throttling_logging_work);
+	// cancel_work_sync(&smu->interrupt_work);
 
-	ret = smu_disable_thermal_alert(smu);
-	if (ret) {
-		dev_err(adev->dev, "Fail to disable thermal alert!\n");
-		return ret;
-	}
+	// ret = smu_disable_thermal_alert(smu);
+	// if (ret) {
+	// 	dev_err(adev->dev, "Fail to disable thermal alert!\n");
+	// 	return ret;
+	// }
 
-	cancel_delayed_work_sync(&smu->swctf_delayed_work);
+	// cancel_delayed_work_sync(&smu->swctf_delayed_work);
 
-	ret = smu_disable_dpms(smu);
-	if (ret) {
-		dev_err(adev->dev, "Fail to disable dpm features!\n");
-		return ret;
-	}
+	// ret = smu_disable_dpms(smu);
+	// if (ret) {
+	// 	dev_err(adev->dev, "Fail to disable dpm features!\n");
+	// 	return ret;
+	// }
 
 	return 0;
 }
