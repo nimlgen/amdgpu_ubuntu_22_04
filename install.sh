@@ -2,15 +2,22 @@ sudo rm -rf build_60301
 mkdir build_60301
 sudo dkms build -m amdgpu -v 6.14.14-2193512.24.04 --sourcetree=`pwd` --dkmstree=`pwd`/build_60301
 
-sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp
-sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp
-sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp
-sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp
-sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp
-sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp
-sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp
+sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp amddrm_exec
+sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp amddrm_exec
+sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp amddrm_exec
+sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp amddrm_exec
+sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp amddrm_exec
+sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp amddrm_exec
+sudo rmmod amdttm amdkcl amd-sched amdgpu amddrm_ttm_helper amddrm_buddy amdxcp amddrm_exec
 
 sudo dmesg -C
+
+sudo modprobe drm
+sudo modprobe drm_exec
+sudo modprobe drm_kms_helper
+sudo modprobe drm_display_helper
+sudo modprobe drm_suballoc_helper
+sudo modprobe video
 
 sudo modprobe drm
 sudo modprobe drm_exec
