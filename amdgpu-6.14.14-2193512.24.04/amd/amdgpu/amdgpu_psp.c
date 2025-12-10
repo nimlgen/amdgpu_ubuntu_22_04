@@ -1401,7 +1401,7 @@ int psp_ta_load(struct psp_context *psp, struct ta_context *context)
 
 	psp_prep_ta_load_cmd_buf(cmd, psp->fw_pri_mc_addr, context);
 
-	dev_info(psp->adev->dev, "PSP: GFX_CMD_ID_LOAD_TA\n");
+	dev_info(psp->adev->dev, "PSP: the GFX_CMD_ID_LOAD_TA\n");
 
 	ret = psp_cmd_submit_buf(psp, NULL, cmd,
 				 psp->fence_buf_mc_addr);
@@ -1455,16 +1455,17 @@ int psp_xgmi_initialize(struct psp_context *psp, bool set_extended_data, bool lo
 	if (!load_ta)
 		goto invoke;
 
+	dev_info(psp->adev->dev, "PSP: XGMI TA initialize\n");
+
 	psp->xgmi_context.context.mem_context.shared_mem_size = PSP_XGMI_SHARED_MEM_SIZE;
 	psp->xgmi_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
+
 
 	if (!psp->xgmi_context.context.mem_context.shared_buf) {
 		ret = psp_ta_init_shared_buf(psp, &psp->xgmi_context.context.mem_context);
 		if (ret)
 			return ret;
 	}
-
-	dev_info(psp->adev->dev, "PSP: XGMI TA initialize\n");
 
 	/* Load XGMI TA */
 	ret = psp_ta_load(psp, &psp->xgmi_context.context);
@@ -1975,6 +1976,8 @@ int psp_ras_initialize(struct psp_context *psp)
 		}
 	}
 
+	dev_info(psp->adev->dev, "PSP_RAS_SHARED_MEM_SIZE: securedisplay ta ucode is available, loading it\n");
+	
 	psp->ras_context.context.mem_context.shared_mem_size = PSP_RAS_SHARED_MEM_SIZE;
 	psp->ras_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
 
@@ -2104,6 +2107,8 @@ static int psp_hdcp_initialize(struct psp_context *psp)
 		return 0;
 	}
 
+	dev_info(psp->adev->dev, "PSP_HDCP_SHARED_MEM_SIZE: securedisplay ta ucode is available, loading it\n");
+	
 	psp->hdcp_context.context.mem_context.shared_mem_size = PSP_HDCP_SHARED_MEM_SIZE;
 	psp->hdcp_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
 
@@ -2178,6 +2183,8 @@ static int psp_dtm_initialize(struct psp_context *psp)
 		return 0;
 	}
 
+	dev_info(psp->adev->dev, "PSP_DTM_SHARED_MEM_SIZE: securedisplay ta ucode is available, loading it\n");
+
 	psp->dtm_context.context.mem_context.shared_mem_size = PSP_DTM_SHARED_MEM_SIZE;
 	psp->dtm_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
 
@@ -2248,6 +2255,8 @@ static int psp_rap_initialize(struct psp_context *psp)
 		dev_info(psp->adev->dev, "RAP: optional rap ta ucode is not available\n");
 		return 0;
 	}
+
+	dev_info(psp->adev->dev, "RAP: rap ta ucode is available, loading it\n");
 
 	psp->rap_context.context.mem_context.shared_mem_size = PSP_RAP_SHARED_MEM_SIZE;
 	psp->rap_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
@@ -2352,6 +2361,8 @@ static int psp_securedisplay_initialize(struct psp_context *psp)
 		return 0;
 	}
 
+	dev_info(psp->adev->dev, "SECUREDISPLAY: securedisplay ta ucode is available, loading it\n");
+	
 	psp->securedisplay_context.context.mem_context.shared_mem_size =
 		PSP_SECUREDISPLAY_SHARED_MEM_SIZE;
 	psp->securedisplay_context.context.ta_load_type = GFX_CMD_ID_LOAD_TA;
