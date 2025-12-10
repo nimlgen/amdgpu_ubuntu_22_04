@@ -3170,32 +3170,32 @@ static int psp_load_fw(struct amdgpu_device *adev)
 		}
 	}
 
-	if (psp->ta_fw) {
-		ret = psp_ras_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"RAS: Failed to initialize RAS\n");
+	// if (psp->ta_fw) {
+	// 	ret = psp_ras_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"RAS: Failed to initialize RAS\n");
 
-		ret = psp_hdcp_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"HDCP: Failed to initialize HDCP\n");
+	// 	ret = psp_hdcp_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"HDCP: Failed to initialize HDCP\n");
 
-		ret = psp_dtm_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"DTM: Failed to initialize DTM\n");
+	// 	ret = psp_dtm_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"DTM: Failed to initialize DTM\n");
 
-		ret = psp_rap_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"RAP: Failed to initialize RAP\n");
+	// 	ret = psp_rap_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"RAP: Failed to initialize RAP\n");
 
-		ret = psp_securedisplay_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"SECUREDISPLAY: Failed to initialize SECUREDISPLAY\n");
-	}
+	// 	ret = psp_securedisplay_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"SECUREDISPLAY: Failed to initialize SECUREDISPLAY\n");
+	// }
 
 	return 0;
 
@@ -3242,16 +3242,16 @@ static int psp_hw_fini(struct amdgpu_ip_block *ip_block)
 	struct amdgpu_device *adev = ip_block->adev;
 	struct psp_context *psp = &adev->psp;
 
-	if (psp->ta_fw) {
-		psp_ras_terminate(psp);
-		psp_securedisplay_terminate(psp);
-		psp_rap_terminate(psp);
-		psp_dtm_terminate(psp);
-		psp_hdcp_terminate(psp);
+	// if (psp->ta_fw) {
+	// 	psp_ras_terminate(psp);
+	// 	psp_securedisplay_terminate(psp);
+	// 	psp_rap_terminate(psp);
+	// 	psp_dtm_terminate(psp);
+	// 	psp_hdcp_terminate(psp);
 
-		if (adev->gmc.xgmi.num_physical_nodes > 1)
-			psp_xgmi_terminate(psp);
-	}
+	// 	if (adev->gmc.xgmi.num_physical_nodes > 1)
+	// 		psp_xgmi_terminate(psp);
+	// }
 
 	psp_asd_terminate(psp);
 	psp_tmr_terminate(psp);
@@ -3276,33 +3276,33 @@ static int psp_suspend(struct amdgpu_ip_block *ip_block)
 		}
 	}
 
-	if (psp->ta_fw) {
-		ret = psp_ras_terminate(psp);
-		if (ret) {
-			dev_err(adev->dev, "Failed to terminate ras ta\n");
-			goto out;
-		}
-		ret = psp_hdcp_terminate(psp);
-		if (ret) {
-			dev_err(adev->dev, "Failed to terminate hdcp ta\n");
-			goto out;
-		}
-		ret = psp_dtm_terminate(psp);
-		if (ret) {
-			dev_err(adev->dev, "Failed to terminate dtm ta\n");
-			goto out;
-		}
-		ret = psp_rap_terminate(psp);
-		if (ret) {
-			dev_err(adev->dev, "Failed to terminate rap ta\n");
-			goto out;
-		}
-		ret = psp_securedisplay_terminate(psp);
-		if (ret) {
-			dev_err(adev->dev, "Failed to terminate securedisplay ta\n");
-			goto out;
-		}
-	}
+	// if (psp->ta_fw) {
+	// 	ret = psp_ras_terminate(psp);
+	// 	if (ret) {
+	// 		dev_err(adev->dev, "Failed to terminate ras ta\n");
+	// 		goto out;
+	// 	}
+	// 	ret = psp_hdcp_terminate(psp);
+	// 	if (ret) {
+	// 		dev_err(adev->dev, "Failed to terminate hdcp ta\n");
+	// 		goto out;
+	// 	}
+	// 	ret = psp_dtm_terminate(psp);
+	// 	if (ret) {
+	// 		dev_err(adev->dev, "Failed to terminate dtm ta\n");
+	// 		goto out;
+	// 	}
+	// 	ret = psp_rap_terminate(psp);
+	// 	if (ret) {
+	// 		dev_err(adev->dev, "Failed to terminate rap ta\n");
+	// 		goto out;
+	// 	}
+	// 	ret = psp_securedisplay_terminate(psp);
+	// 	if (ret) {
+	// 		dev_err(adev->dev, "Failed to terminate securedisplay ta\n");
+	// 		goto out;
+	// 	}
+	// }
 
 	ret = psp_asd_terminate(psp);
 	if (ret) {
@@ -3376,32 +3376,32 @@ static int psp_resume(struct amdgpu_ip_block *ip_block)
 	// 			"XGMI: Failed to initialize XGMI session\n");
 	// }
 
-	if (psp->ta_fw) {
-		ret = psp_ras_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"RAS: Failed to initialize RAS\n");
+	// if (psp->ta_fw) {
+	// 	ret = psp_ras_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"RAS: Failed to initialize RAS\n");
 
-		ret = psp_hdcp_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"HDCP: Failed to initialize HDCP\n");
+	// 	ret = psp_hdcp_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"HDCP: Failed to initialize HDCP\n");
 
-		ret = psp_dtm_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"DTM: Failed to initialize DTM\n");
+	// 	ret = psp_dtm_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"DTM: Failed to initialize DTM\n");
 
-		ret = psp_rap_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"RAP: Failed to initialize RAP\n");
+	// 	ret = psp_rap_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"RAP: Failed to initialize RAP\n");
 
-		ret = psp_securedisplay_initialize(psp);
-		if (ret)
-			dev_err(psp->adev->dev,
-				"SECUREDISPLAY: Failed to initialize SECUREDISPLAY\n");
-	}
+	// 	ret = psp_securedisplay_initialize(psp);
+	// 	if (ret)
+	// 		dev_err(psp->adev->dev,
+	// 			"SECUREDISPLAY: Failed to initialize SECUREDISPLAY\n");
+	// }
 
 	mutex_unlock(&adev->firmware.mutex);
 
