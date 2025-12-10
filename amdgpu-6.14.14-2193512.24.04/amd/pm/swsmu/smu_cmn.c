@@ -340,6 +340,7 @@ int smu_cmn_send_msg_without_waiting(struct smu_context *smu,
 			goto Out;
 	}
 
+	dev_info(adev->dev, "Sending raw SMU message %d with param 0x%08X", msg_index, param);
 	__smu_cmn_send_msg(smu, msg_index, param);
 	res = 0;
 Out:
@@ -427,6 +428,8 @@ int smu_cmn_send_smc_msg_with_param(struct smu_context *smu,
 	if (adev->no_hw_access)
 		return 0;
 
+	dev_info(adev->dev, "Sending SMU message %s(%d) with param 0x%08X",
+		smu_get_message_name(smu, msg), msg, param);
 	index = smu_cmn_to_asic_specific_index(smu,
 					       CMN2ASIC_MAPPING_MSG,
 					       msg);

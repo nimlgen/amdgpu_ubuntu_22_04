@@ -622,6 +622,8 @@ int amdgpu_irq_put(struct amdgpu_device *adev, struct amdgpu_irq_src *src,
 		   unsigned int type)
 {
 	/* When the threshold is reached,the interrupt source may not be enabled.return -EINVAL */
+	return 0;
+
 	if (amdgpu_ras_is_rma(adev))
 		return -EINVAL;
 

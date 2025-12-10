@@ -299,79 +299,80 @@ static int ih_v6_1_irq_init(struct amdgpu_device *adev)
 	int i;
 
 	/* disable irqs */
+	dev_info(adev->dev, "ih_v6_1_irq_init\n");
 	ret = ih_v6_1_toggle_interrupts(adev, false);
 	if (ret)
 		return ret;
 
-	adev->nbio.funcs->ih_control(adev);
+	// adev->nbio.funcs->ih_control(adev);
 
-	if (unlikely((adev->firmware.load_type == AMDGPU_FW_LOAD_DIRECT) ||
-		     (adev->firmware.load_type == AMDGPU_FW_LOAD_RLC_BACKDOOR_AUTO))) {
-		if (ih[0]->use_bus_addr) {
-			ih_chicken = RREG32_SOC15(OSSSYS, 0, regIH_CHICKEN);
-			ih_chicken = REG_SET_FIELD(ih_chicken,
-					IH_CHICKEN, MC_SPACE_GPA_ENABLE, 1);
-			WREG32_SOC15(OSSSYS, 0, regIH_CHICKEN, ih_chicken);
-		}
-	}
+	// if (unlikely((adev->firmware.load_type == AMDGPU_FW_LOAD_DIRECT) ||
+	// 	     (adev->firmware.load_type == AMDGPU_FW_LOAD_RLC_BACKDOOR_AUTO))) {
+	// 	if (ih[0]->use_bus_addr) {
+	// 		ih_chicken = RREG32_SOC15(OSSSYS, 0, regIH_CHICKEN);
+	// 		ih_chicken = REG_SET_FIELD(ih_chicken,
+	// 				IH_CHICKEN, MC_SPACE_GPA_ENABLE, 1);
+	// 		WREG32_SOC15(OSSSYS, 0, regIH_CHICKEN, ih_chicken);
+	// 	}
+	// }
 
-	for (i = 0; i < ARRAY_SIZE(ih); i++) {
-		if (ih[i]->ring_size) {
-			ret = ih_v6_1_enable_ring(adev, ih[i]);
-			if (ret)
-				return ret;
-		}
-	}
+	// for (i = 0; i < ARRAY_SIZE(ih); i++) {
+	// 	if (ih[i]->ring_size) {
+	// 		ret = ih_v6_1_enable_ring(adev, ih[i]);
+	// 		if (ret)
+	// 			return ret;
+	// 	}
+	// }
 
 	/* update doorbell range for ih ring 0 */
-	adev->nbio.funcs->ih_doorbell_range(adev, ih[0]->use_doorbell,
-					    ih[0]->doorbell_index);
+	// adev->nbio.funcs->ih_doorbell_range(adev, ih[0]->use_doorbell,
+	// 				    ih[0]->doorbell_index);
 
-	tmp = RREG32_SOC15(OSSSYS, 0, regIH_STORM_CLIENT_LIST_CNTL);
-	tmp = REG_SET_FIELD(tmp, IH_STORM_CLIENT_LIST_CNTL,
-			    CLIENT18_IS_STORM_CLIENT, 1);
-	WREG32_SOC15(OSSSYS, 0, regIH_STORM_CLIENT_LIST_CNTL, tmp);
+	// tmp = RREG32_SOC15(OSSSYS, 0, regIH_STORM_CLIENT_LIST_CNTL);
+	// tmp = REG_SET_FIELD(tmp, IH_STORM_CLIENT_LIST_CNTL,
+	// 		    CLIENT18_IS_STORM_CLIENT, 1);
+	// WREG32_SOC15(OSSSYS, 0, regIH_STORM_CLIENT_LIST_CNTL, tmp);
 
-	tmp = RREG32_SOC15(OSSSYS, 0, regIH_INT_FLOOD_CNTL);
-	tmp = REG_SET_FIELD(tmp, IH_INT_FLOOD_CNTL, FLOOD_CNTL_ENABLE, 1);
-	WREG32_SOC15(OSSSYS, 0, regIH_INT_FLOOD_CNTL, tmp);
+	// tmp = RREG32_SOC15(OSSSYS, 0, regIH_INT_FLOOD_CNTL);
+	// tmp = REG_SET_FIELD(tmp, IH_INT_FLOOD_CNTL, FLOOD_CNTL_ENABLE, 1);
+	// WREG32_SOC15(OSSSYS, 0, regIH_INT_FLOOD_CNTL, tmp);
 
 	/* GC/MMHUB UTCL2 page fault interrupts are configured as
 	 * MSI storm capable interrupts by deafult. The delay is
 	 * used to avoid ISR being called too frequently
 	 * when page fault happens on several continuous page
 	 * and thus avoid MSI storm */
-	tmp = RREG32_SOC15(OSSSYS, 0, regIH_MSI_STORM_CTRL);
-	tmp = REG_SET_FIELD(tmp, IH_MSI_STORM_CTRL,
-			    DELAY, 3);
-	WREG32_SOC15(OSSSYS, 0, regIH_MSI_STORM_CTRL, tmp);
+	// tmp = RREG32_SOC15(OSSSYS, 0, regIH_MSI_STORM_CTRL);
+	// tmp = REG_SET_FIELD(tmp, IH_MSI_STORM_CTRL,
+	// 		    DELAY, 3);
+	// WREG32_SOC15(OSSSYS, 0, regIH_MSI_STORM_CTRL, tmp);
 
 	/* Redirect the interrupts to IH RB1 for dGPU */
-	if (adev->irq.ih1.ring_size) {
-		tmp = RREG32_SOC15(OSSSYS, 0, regIH_RING1_CLIENT_CFG_INDEX);
-		tmp = REG_SET_FIELD(tmp, IH_RING1_CLIENT_CFG_INDEX, INDEX, 0);
-		WREG32_SOC15(OSSSYS, 0, regIH_RING1_CLIENT_CFG_INDEX, tmp);
+	// if (adev->irq.ih1.ring_size) {
+	// 	tmp = RREG32_SOC15(OSSSYS, 0, regIH_RING1_CLIENT_CFG_INDEX);
+	// 	tmp = REG_SET_FIELD(tmp, IH_RING1_CLIENT_CFG_INDEX, INDEX, 0);
+	// 	WREG32_SOC15(OSSSYS, 0, regIH_RING1_CLIENT_CFG_INDEX, tmp);
 
-		tmp = RREG32_SOC15(OSSSYS, 0, regIH_RING1_CLIENT_CFG_DATA);
-		tmp = REG_SET_FIELD(tmp, IH_RING1_CLIENT_CFG_DATA, CLIENT_ID, 0xa);
-		tmp = REG_SET_FIELD(tmp, IH_RING1_CLIENT_CFG_DATA, SOURCE_ID, 0x0);
-		tmp = REG_SET_FIELD(tmp, IH_RING1_CLIENT_CFG_DATA,
-				    SOURCE_ID_MATCH_ENABLE, 0x1);
+	// 	tmp = RREG32_SOC15(OSSSYS, 0, regIH_RING1_CLIENT_CFG_DATA);
+	// 	tmp = REG_SET_FIELD(tmp, IH_RING1_CLIENT_CFG_DATA, CLIENT_ID, 0xa);
+	// 	tmp = REG_SET_FIELD(tmp, IH_RING1_CLIENT_CFG_DATA, SOURCE_ID, 0x0);
+	// 	tmp = REG_SET_FIELD(tmp, IH_RING1_CLIENT_CFG_DATA,
+	// 			    SOURCE_ID_MATCH_ENABLE, 0x1);
 
-		WREG32_SOC15(OSSSYS, 0, regIH_RING1_CLIENT_CFG_DATA, tmp);
-	}
+	// 	WREG32_SOC15(OSSSYS, 0, regIH_RING1_CLIENT_CFG_DATA, tmp);
+	// }
 
 	pci_set_master(adev->pdev);
 
 	/* enable interrupts */
-	ret = ih_v6_1_toggle_interrupts(adev, true);
-	if (ret)
-		return ret;
-	/* enable wptr force update for self int */
-	force_update_wptr_for_self_int(adev, 0, 8, true);
+	// ret = ih_v6_1_toggle_interrupts(adev, true);
+	// if (ret)
+	// 	return ret;
+	// /* enable wptr force update for self int */
+	// force_update_wptr_for_self_int(adev, 0, 8, true);
 
-	if (adev->irq.ih_soft.ring_size)
-		adev->irq.ih_soft.enabled = true;
+	// if (adev->irq.ih_soft.ring_size)
+	// 	adev->irq.ih_soft.enabled = true;
 
 	return 0;
 }

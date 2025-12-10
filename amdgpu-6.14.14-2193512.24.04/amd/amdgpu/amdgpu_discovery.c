@@ -3090,9 +3090,9 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 			return r;
 	}
 
-	r = amdgpu_discovery_set_display_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_display_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 
 	r = amdgpu_discovery_set_gc_ip_blocks(adev);
 	if (r)
@@ -3110,25 +3110,25 @@ int amdgpu_discovery_set_ip_blocks(struct amdgpu_device *adev)
 			return r;
 	}
 
-	r = amdgpu_discovery_set_mm_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_mm_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 
-	r = amdgpu_discovery_set_mes_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_mes_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 
-	r = amdgpu_discovery_set_vpe_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_vpe_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 
-	r = amdgpu_discovery_set_umsch_mm_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_umsch_mm_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 
-	r = amdgpu_discovery_set_isp_ip_blocks(adev);
-	if (r)
-		return r;
+	// r = amdgpu_discovery_set_isp_ip_blocks(adev);
+	// if (r)
+	// 	return r;
 	return 0;
 }
 

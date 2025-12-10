@@ -2894,6 +2894,9 @@ int psp_execute_ip_fw_load(struct psp_context *psp,
 	int ret = 0;
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
 
+	dev_info(psp->adev->dev, "PSP load IP firmware %s(0x%X) ",
+			 amdgpu_ucode_name(ucode->ucode_id), ucode->ucode_id);
+
 	ret = psp_prep_load_ip_fw_cmd_buf(psp, ucode, cmd);
 	if (!ret) {
 		ret = psp_cmd_submit_buf(psp, ucode, cmd,
@@ -3443,6 +3446,9 @@ int psp_ring_cmd_submit(struct psp_context *psp,
 	write_frame->fence_addr_lo = lower_32_bits(fence_mc_addr);
 	write_frame->fence_value = index;
 	amdgpu_device_flush_hdp(adev, NULL);
+
+	dev_info(adev->dev, "PSP ring cmd submit: cmd_buf_mc_addr = 0x%016llX, fence_mc_addr = 0x%016llX, index = %d\n",
+			cmd_buf_mc_addr, fence_mc_addr, index);
 
 	/* Update the write Pointer in DWORDs */
 	psp_write_ptr_reg = (psp_write_ptr_reg + rb_frame_size_dw) % ring_size_dw;
