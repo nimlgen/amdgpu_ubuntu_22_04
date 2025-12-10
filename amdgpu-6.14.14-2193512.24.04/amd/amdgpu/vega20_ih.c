@@ -312,77 +312,81 @@ static int vega20_ih_irq_init(struct amdgpu_device *adev)
 	int i;
 
 	/* disable irqs */
+	dev_info(adev->dev, "ih: vega20 irq init\n");
+
 	ret = vega20_ih_toggle_interrupts(adev, false);
 	if (ret)
 		return ret;
 
 	adev->nbio.funcs->ih_control(adev);
 
-	if (!amdgpu_sriov_vf(adev)) {
-		if ((amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 2, 1)) &&
-		    adev->firmware.load_type == AMDGPU_FW_LOAD_DIRECT) {
-			ih_chicken = RREG32_SOC15(OSSSYS, 0, mmIH_CHICKEN);
-			if (adev->irq.ih.use_bus_addr) {
-				ih_chicken = REG_SET_FIELD(ih_chicken, IH_CHICKEN,
-							   MC_SPACE_GPA_ENABLE, 1);
-			}
-			WREG32_SOC15(OSSSYS, 0, mmIH_CHICKEN, ih_chicken);
-		}
+	dev_info(adev->dev, "ih: vega20 irq init DONE\n");
 
-		/* psp firmware won't program IH_CHICKEN for aldebaran
-		 * driver needs to program it properly according to
-		 * MC_SPACE type in IH_RB_CNTL */
-		if ((amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 0)) ||
-		    (amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 2)) ||
-		    (amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 5))) {
-			ih_chicken = RREG32_SOC15(OSSSYS, 0, mmIH_CHICKEN_ALDEBARAN);
-			if (adev->irq.ih.use_bus_addr) {
-				ih_chicken = REG_SET_FIELD(ih_chicken, IH_CHICKEN,
-							   MC_SPACE_GPA_ENABLE, 1);
-			}
-			WREG32_SOC15(OSSSYS, 0, mmIH_CHICKEN_ALDEBARAN, ih_chicken);
-		}
-	}
+	// if (!amdgpu_sriov_vf(adev)) {
+	// 	if ((amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 2, 1)) &&
+	// 	    adev->firmware.load_type == AMDGPU_FW_LOAD_DIRECT) {
+	// 		ih_chicken = RREG32_SOC15(OSSSYS, 0, mmIH_CHICKEN);
+	// 		if (adev->irq.ih.use_bus_addr) {
+	// 			ih_chicken = REG_SET_FIELD(ih_chicken, IH_CHICKEN,
+	// 						   MC_SPACE_GPA_ENABLE, 1);
+	// 		}
+	// 		WREG32_SOC15(OSSSYS, 0, mmIH_CHICKEN, ih_chicken);
+	// 	}
 
-	for (i = 0; i < ARRAY_SIZE(ih); i++) {
-		if (ih[i]->ring_size) {
-			ret = vega20_ih_enable_ring(adev, ih[i]);
-			if (ret)
-				return ret;
-		}
-		ih[i]->overflow = false;
-	}
+	// 	/* psp firmware won't program IH_CHICKEN for aldebaran
+	// 	 * driver needs to program it properly according to
+	// 	 * MC_SPACE type in IH_RB_CNTL */
+	// 	if ((amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 0)) ||
+	// 	    (amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 2)) ||
+	// 	    (amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 5))) {
+	// 		ih_chicken = RREG32_SOC15(OSSSYS, 0, mmIH_CHICKEN_ALDEBARAN);
+	// 		if (adev->irq.ih.use_bus_addr) {
+	// 			ih_chicken = REG_SET_FIELD(ih_chicken, IH_CHICKEN,
+	// 						   MC_SPACE_GPA_ENABLE, 1);
+	// 		}
+	// 		WREG32_SOC15(OSSSYS, 0, mmIH_CHICKEN_ALDEBARAN, ih_chicken);
+	// 	}
+	// }
 
-	if (!amdgpu_sriov_vf(adev))
-		adev->nbio.funcs->ih_doorbell_range(adev, adev->irq.ih.use_doorbell,
-						    adev->irq.ih.doorbell_index);
+	// for (i = 0; i < ARRAY_SIZE(ih); i++) {
+	// 	if (ih[i]->ring_size) {
+	// 		ret = vega20_ih_enable_ring(adev, ih[i]);
+	// 		if (ret)
+	// 			return ret;
+	// 	}
+	// 	ih[i]->overflow = false;
+	// }
+
+	// if (!amdgpu_sriov_vf(adev))
+	// 	adev->nbio.funcs->ih_doorbell_range(adev, adev->irq.ih.use_doorbell,
+	// 					    adev->irq.ih.doorbell_index);
 
 	pci_set_master(adev->pdev);
 
 	/* Allocate the doorbell for IH Retry CAM */
-	adev->irq.retry_cam_doorbell_index = (adev->doorbell_index.ih + 3) << 1;
-	WREG32_SOC15(OSSSYS, 0, mmIH_DOORBELL_RETRY_CAM,
-		vega20_setup_retry_doorbell(adev->irq.retry_cam_doorbell_index));
+	// adev->irq.retry_cam_doorbell_index = (adev->doorbell_index.ih + 3) << 1;
+	// WREG32_SOC15(OSSSYS, 0, mmIH_DOORBELL_RETRY_CAM,
+	// 	vega20_setup_retry_doorbell(adev->irq.retry_cam_doorbell_index));
 
-	/* Enable IH Retry CAM */
-	if (amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 0) ||
-	    amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 2) ||
-	    amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 4) ||
-	    amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 5))
-		WREG32_FIELD15(OSSSYS, 0, IH_RETRY_INT_CAM_CNTL_ALDEBARAN,
-			       ENABLE, 1);
-	else
-		WREG32_FIELD15(OSSSYS, 0, IH_RETRY_INT_CAM_CNTL, ENABLE, 1);
+	// /* Enable IH Retry CAM */
+	// if (amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 0) ||
+	//     amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 2) ||
+	//     amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 4) ||
+	//     amdgpu_ip_version(adev, OSSSYS_HWIP, 0) == IP_VERSION(4, 4, 5))
+	// 	WREG32_FIELD15(OSSSYS, 0, IH_RETRY_INT_CAM_CNTL_ALDEBARAN,
+	// 		       ENABLE, 1);
+	// else
+	// 	WREG32_FIELD15(OSSSYS, 0, IH_RETRY_INT_CAM_CNTL, ENABLE, 1);
 
-	adev->irq.retry_cam_enabled = true;
+	// adev->irq.retry_cam_enabled = true;
 
-	/* enable interrupts */
-	ret = vega20_ih_toggle_interrupts(adev, true);
-	if (ret)
-		return ret;
+	// /* enable interrupts */
+	// ret = vega20_ih_toggle_interrupts(adev, true);
+	// if (ret)
+	// 	return ret;
 
-	if (adev->irq.ih_soft.ring_size)
-		adev->irq.ih_soft.enabled = true;
+	// if (adev->irq.ih_soft.ring_size)
+	// 	adev->irq.ih_soft.enabled = true;
 
 	return 0;
 }
