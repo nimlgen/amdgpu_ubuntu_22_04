@@ -723,6 +723,10 @@ static void init_mqd_v9_4_3(struct mqd_manager *mm, void **mqd,
 	uint64_t offset = mm->mqd_stride(mm, q);
 	uint32_t local_xcc_start = mm->dev->dqm->current_logical_xcc_start++;
 
+	dev_info(mm->dev->adev->dev,
+			"Assigning logical XCC start ID %u to queue\n",
+			local_xcc_start % NUM_XCC(mm->dev->xcc_mask));
+
 	memset(&xcc_mqd_mem_obj, 0x0, sizeof(struct kfd_mem_obj));
 	for (xcc = 0; xcc < NUM_XCC(mm->dev->xcc_mask); xcc++) {
 		get_xcc_mqd(mqd_mem_obj, &xcc_mqd_mem_obj, offset*xcc);
@@ -785,6 +789,10 @@ static void update_mqd_v9_4_3(struct mqd_manager *mm, void *mqd,
 	struct v9_mqd *m;
 	int xcc = 0;
 	uint64_t size = mm->mqd_stride(mm, q);
+
+	dev_info(mm->dev->adev->dev,
+			"Updating MQD for queue with logical XCC start ID %u\n",
+			mm->dev->dqm->current_logical_xcc_start - NUM_XCC(mm->dev->xcc_mask));
 
 	for (xcc = 0; xcc < NUM_XCC(mm->dev->xcc_mask); xcc++) {
 		m = get_mqd(mqd + size * xcc);

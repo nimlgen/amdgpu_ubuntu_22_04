@@ -229,6 +229,10 @@ static int kgd_gfx_v9_4_3_set_pasid_vmid_mapping(struct amdgpu_device *adev,
 	/* Every two XCCs share one AID */
 	unsigned int aid = phy_inst / 2;
 
+	dev_info(adev->dev,
+		"Setting PASID %u to VMID %u on XCC instance %u (AID %u)\n",
+		pasid, vmid, phy_inst, aid);
+
 	/*
 	 * We have to assume that there is no outstanding mapping.
 	 * The ATC_VMID_PASID_MAPPING_UPDATE_STATUS bit could be 0 because
@@ -289,6 +293,10 @@ static int kgd_gfx_v9_4_3_hqd_load(struct amdgpu_device *adev, void *mqd,
 	struct v9_mqd *m;
 	uint32_t *mqd_hqd;
 	uint32_t reg, hqd_base, hqd_end, data;
+
+	dev_info(adev->dev,
+		"Loading HQD pipe %u queue %u on XCC instance %u\n",
+		pipe_id, queue_id, GET_INST(GC, inst));
 
 	m = get_mqd(mqd);
 
@@ -535,7 +543,7 @@ static void kgd_gfx_v9_4_3_override_core_cg(struct amdgpu_device *adev,
 	amdgpu_gfx_select_se_sh(adev, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, inst);
 	mutex_unlock(&adev->grbm_idx_mutex);
 
-	dev_dbg(adev->dev, "sq clock control on instance [%d]: 0x%x\n",
+	dev_info(adev->dev, "sq clock control on instance [%d]: 0x%x\n",
 				GET_INST(GC, inst), sq_clk_ctrl);
 }
 

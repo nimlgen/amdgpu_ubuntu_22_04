@@ -2335,7 +2335,7 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
 	int ret, retry = 0, i;
 	bool supports_atomic = false;
 
-	if (memcmp(pci_name(pdev), "0000:e5:00.0", 12)) {
+	if (memcmp(pci_name(pdev), "0000:c6:00.0", 12)) {
 		return -ENODEV;
 	}
 
