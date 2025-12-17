@@ -970,6 +970,8 @@ static int sdma_v4_4_2_inst_start(struct amdgpu_device *adev,
 	uint32_t tmp_mask;
 	int i, r = 0;
 
+	dev_info(adev->dev, "SDMA V4.4.2 starting\n");
+
 	if (amdgpu_sriov_vf(adev)) {
 		sdma_v4_4_2_inst_ctx_switch_enable(adev, false, inst_mask);
 		sdma_v4_4_2_inst_enable(adev, false, inst_mask);
@@ -995,10 +997,11 @@ static int sdma_v4_4_2_inst_start(struct amdgpu_device *adev,
 
 		WREG32_SDMA(i, regSDMA_SEM_WAIT_FAIL_TIMER_CNTL, 0);
 		sdma_v4_4_2_gfx_resume(adev, i, restore);
-		if (adev->sdma.has_page_queue)
-			sdma_v4_4_2_page_resume(adev, i, restore);
+		// if (adev->sdma.has_page_queue)
+		// 	sdma_v4_4_2_page_resume(adev, i, restore);
 
 		/* set utc l1 enable flag always to 1 */
+		dev_info(adev->dev, "SDMA V4.4.2 enabling UTC_L1\n");
 		temp = RREG32_SDMA(i, regSDMA_CNTL);
 		temp = REG_SET_FIELD(temp, SDMA_CNTL, UTC_L1_ENABLE, 1);
 		WREG32_SDMA(i, regSDMA_CNTL, temp);
@@ -1022,6 +1025,8 @@ static int sdma_v4_4_2_inst_start(struct amdgpu_device *adev,
 		sdma_v4_4_2_inst_ctx_switch_enable(adev, true, inst_mask);
 		sdma_v4_4_2_inst_enable(adev, true, inst_mask);
 	} else {
+		dev_info(adev->dev, "SDMA V4.4.2 RLC resume\n");
+		
 		r = sdma_v4_4_2_inst_rlc_resume(adev, inst_mask);
 		if (r)
 			return r;
@@ -1031,18 +1036,21 @@ static int sdma_v4_4_2_inst_start(struct amdgpu_device *adev,
 	for_each_inst(i, tmp_mask) {
 		ring = &adev->sdma.instance[i].ring;
 
+		dev_info(adev->dev, "SDMA V4.4.2 testing ring %d\n", i);
 		r = amdgpu_ring_test_helper(ring);
 		if (r)
 			return r;
 
-		if (adev->sdma.has_page_queue) {
-			struct amdgpu_ring *page = &adev->sdma.instance[i].page;
+		// if (adev->sdma.has_page_queue) {
+		// 	struct amdgpu_ring *page = &adev->sdma.instance[i].page;
 
-			r = amdgpu_ring_test_helper(page);
-			if (r)
-				return r;
-		}
+		// 	r = amdgpu_ring_test_helper(page);
+		// 	if (r)
+		// 		return r;
+		// }
 	}
+
+	dev_info(adev->dev, "SDMA V4.4.2 end\n");
 
 	return r;
 }
@@ -1357,8 +1365,8 @@ static int sdma_v4_4_2_early_init(struct amdgpu_ip_block *ip_block)
 		return r;
 
 	/* TODO: Page queue breaks driver reload under SRIOV */
-	if (sdma_v4_4_2_fw_support_paging_queue(adev))
-		adev->sdma.has_page_queue = true;
+	// if (sdma_v4_4_2_fw_support_paging_queue(adev))
+	// 	adev->sdma.has_page_queue = true;
 
 	sdma_v4_4_2_set_ring_funcs(adev);
 	sdma_v4_4_2_set_buffer_funcs(adev);
@@ -1471,6 +1479,8 @@ static int sdma_v4_4_2_sw_init(struct amdgpu_ip_block *ip_block)
 
 		/* doorbell size is 2 dwords, get DWORD offset */
 		ring->doorbell_index = adev->doorbell_index.sdma_engine[i] << 1;
+		dev_info(adev->dev, "SDMA doorbell index %d for instance %d\n",
+				ring->doorbell_index, i);
 		ring->vm_hub = AMDGPU_MMHUB0(aid_id);
 
 		sprintf(ring->name, "sdma%d.%d", aid_id,
@@ -1555,6 +1565,8 @@ static int sdma_v4_4_2_hw_init(struct amdgpu_ip_block *ip_block)
 	int r;
 	struct amdgpu_device *adev = ip_block->adev;
 	uint32_t inst_mask;
+
+	dev_info(adev->dev, "SDMA V4.4.2 hw init %d\n", GET_INST(SDMA0, 0));
 
 	inst_mask = GENMASK(adev->sdma.num_instances - 1, 0);
 	if (!amdgpu_sriov_vf(adev))

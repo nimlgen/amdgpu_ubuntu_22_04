@@ -440,9 +440,11 @@ static void nbio_v7_9_init_registers(struct amdgpu_device *adev)
 
 	inst_mask = adev->aid_mask & ~1U;
 	for_each_inst(i, inst_mask) {
+		dev_info(adev->dev,
+				"Disabling doorbell fence for SHUB instance %d\n",
+				i);
 		WREG32_SOC15_EXT(NBIO, i, regXCC_DOORBELL_FENCE, i,
 			XCC_DOORBELL_FENCE__SHUB_SLV_MODE_MASK);
-
 	}
 
 	if (!amdgpu_sriov_vf(adev)) {

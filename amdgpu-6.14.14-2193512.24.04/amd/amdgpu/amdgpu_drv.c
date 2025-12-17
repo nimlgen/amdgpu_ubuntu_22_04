@@ -769,7 +769,7 @@ module_param_named(use_xgmi_p2p, amdgpu_use_xgmi_p2p, int, 0444);
  * Setting 1 disables over-subscription. Setting 2 disables HWS and statically
  * assigns queues to HQDs.
  */
-int sched_policy = KFD_SCHED_POLICY_HWS;
+int sched_policy = 2;
 module_param_unsafe(sched_policy, int, 0444);
 MODULE_PARM_DESC(sched_policy,
 	"Scheduling policy (0 = HWS (Default), 1 = HWS without over-subscription, 2 = Non-HWS (Used for debugging only)");

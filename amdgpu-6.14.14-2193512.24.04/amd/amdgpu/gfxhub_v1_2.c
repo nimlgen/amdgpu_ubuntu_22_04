@@ -366,6 +366,9 @@ static void gfxhub_v1_2_xcc_setup_vmid_config(struct amdgpu_device *adev,
 			tmp = REG_SET_FIELD(tmp, VM_CONTEXT1_CNTL,
 					    PAGE_TABLE_BLOCK_SIZE,
 					    block_size);
+
+			dev_info(adev->dev, "VMID %d: page table depth %d, block size %d\n",
+					i, num_level, block_size);
 			/* Send no-retry XNACK on fault to suppress VM fault storm.
 			 * On 9.4.3 variants, XNACK can be enabled in
 			 * the SQ per-process.

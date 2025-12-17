@@ -1178,6 +1178,10 @@ void amdgpu_device_indirect_wreg_ext(struct amdgpu_device *adev,
 	else
 		pcie_index_hi = 0;
 
+	dev_info(adev->dev, "Indirect Writing register 0x%llx with value 0x%x\n", reg_addr, reg_data);
+	dev_info(adev->dev, "pcie_index=%lu, pcie_index_hi=%lu, pcie_data=%lu\n",
+		 pcie_index, pcie_index_hi, pcie_data);
+
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
 	pcie_index_offset = (void __iomem *)adev->rmmio + pcie_index * 4;
 	pcie_data_offset = (void __iomem *)adev->rmmio + pcie_data * 4;
@@ -1186,18 +1190,26 @@ void amdgpu_device_indirect_wreg_ext(struct amdgpu_device *adev,
 				pcie_index_hi * 4;
 
 	writel(reg_addr, pcie_index_offset);
+	dev_info(adev->dev, "Wrote pcie_index_offset, %x: %llx", pcie_index_offset, reg_addr);
 	readl(pcie_index_offset);
+	dev_info(adev->dev, "Read back pcie_index_offset, %x: %x", pcie_index_offset, readl(pcie_index_offset));
 	if (pcie_index_hi != 0) {
 		writel((reg_addr >> 32) & 0xff, pcie_index_hi_offset);
+		dev_info(adev->dev, "Wrote pcie_index_hi_offset, %x: %llx", pcie_index_hi_offset, (reg_addr >> 32) & 0xff);
 		readl(pcie_index_hi_offset);
+		dev_info(adev->dev, "Read back pcie_index_hi_offset, %x: %x", pcie_index_hi_offset, readl(pcie_index_hi_offset));
 	}
 	writel(reg_data, pcie_data_offset);
+	dev_info(adev->dev, "Wrote pcie_data_offset, %x: %x", pcie_data_offset, reg_data);
 	readl(pcie_data_offset);
+	dev_info(adev->dev, "Read back pcie_data_offset, %x: %x", pcie_data_offset, readl(pcie_data_offset));
 
 	/* clear the high bits */
 	if (pcie_index_hi != 0) {
 		writel(0, pcie_index_hi_offset);
+		dev_info(adev->dev, "Cleared pcie_index_hi_offset, %x", pcie_index_hi_offset);
 		readl(pcie_index_hi_offset);
+		dev_info(adev->dev, "Read back cleared pcie_index_hi_offset, %x: %x", pcie_index_hi_offset, readl(pcie_index_hi_offset));
 	}
 
 	spin_unlock_irqrestore(&adev->pcie_idx_lock, flags);
