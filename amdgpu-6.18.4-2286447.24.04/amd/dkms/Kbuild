@@ -1,0 +1,88 @@
+ifeq ($(CC), gcc)
+GCCMAJ=$(shell echo __GNUC__ | $(CC) -E -x c - | tail -n 1)
+GCCMIN=$(shell echo __GNUC_MINOR__ | $(CC) -E -x c - | tail -n 1)
+GCCPAT=$(shell echo __GNUC_PATCHLEVEL__ | $(CC) -E -x c - | tail -n 1)
+# CONFIG_GCC_VERSION returns x.xx.xx as the version format
+GCCSTR=$(shell printf "%d%02d%02d" $(GCCMAJ) $(GCCMIN) $(GCCPAT))
+
+KERNEL_MAJ=$(VERSION)
+KERNEL_PATCHLEVEL=$(PATCHLEVEL)
+KERNEL_SUBLEVEL=$(SUBLEVEL)
+KERNEL_VER=$(shell printf "%d%02d%02d" $(KERNEL_MAJ) $(KERNEL_PATCHLEVEL) $(KERNEL_SUBLEVEL))
+
+kernel-version = $(shell [ $(KERNEL_VER)0 $(1) $(2)000 ] && echo $(3) || echo $(4))
+
+ifdef CONFIG_CC_IS_GCC
+ifeq ($(shell [ $(CONFIG_GCC_VERSION) -ne $(GCCSTR) ] && echo y), y)
+$(warning "Local GCC version $(GCCSTR) does not match kernel compiler GCC version $(CONFIG_GCC_VERSION)")
+$(warning "This may cause unexpected and hard-to-isolate compiler-related issues")
+endif
+else
+export CONFIG_CC_IS_GCC=y
+export CONFIG_GCC_VERSION=$(GCCSTR)
+$(warning "CONFIG_CC_IS_GCC is not defined. Let's export it with version $(CONFIG_GCC_VERSION)")
+endif
+
+endif
+
+include $(src)/amd/dkms/dkms-config.mk
+
+_KCL_LINUXINCLUDE=$(subst -I ,-I,$(strip $(LINUXINCLUDE)))
+LINUX_SRCTREE_INCLUDE := \
+	$(filter-out -I%/uapi "-include %/kconfig.h",$(_KCL_LINUXINCLUDE))
+USER_INCLUDE := $(filter-out $(LINUX_SRCTREE_INCLUDE), $(_KCL_LINUXINCLUDE))
+
+# In the peerdirect m4, we determine if the p2p symbols are in the ofa_kernel's Module.symvers
+# If so, we need to include the path for the function pointers, as well as the include path for
+# rdma/peer_mem.h, since the ofa_kernel isn't integrated into the base kernel in that configuration
+_is_kcl_macro_defined=$(shell grep $1 $(src)/amd/dkms/config/config.h | grep -q "define" && echo "y" || echo "n")
+ifeq ($(call _is_kcl_macro_defined,HAVE_KFD_PEERDIRECT_SUPPORT_NEED_OFAPATH),y)
+KBUILD_EXTRA_SYMBOLS += /usr/src/ofa_kernel/x86_64/$(KERNELRELEASE)/Module.symvers
+USER_INCLUDE += -I/usr/src/ofa_kernel/x86_64/$(KERNELRELEASE)/include
+endif
+
+LINUXINCLUDE := \
+	-I$(src)/include \
+	-I$(src)/include/kcl/header \
+	-include $(src)/include/kcl/kcl_version.h \
+	-include $(src)/include/rename_symbol.h \
+	-include $(src)/amd/dkms/config/config.h \
+	$(LINUX_SRCTREE_INCLUDE) \
+	-I$(src)/include/uapi \
+	$(USER_INCLUDE)
+
+export CONFIG_DRM_TTM=m
+export CONFIG_DRM_AMDGPU=m
+export CONFIG_DRM_SCHED=m
+
+subdir-ccflags-y += -Wno-error
+
+# Trying to enable DCN2/3 with core2 optimizations will result in
+# older versions of GCC hanging during building/installing. Check
+# if the compiler is using core2 optimizations and only build DCN2/3
+# if core2 isn't in the compiler flags
+ifndef CONFIG_ARM64
+    ifeq ($(CC), clang)
+        export CONFIG_DRM_AMD_DC_FP=y
+        subdir-ccflags-y += -DCONFIG_DRM_AMD_DC_FP
+    else ifeq ($(filter %core2, $(KBUILD_CFLAGS)),)
+        export CONFIG_DRM_AMD_DC_FP=y
+        subdir-ccflags-y += -DCONFIG_DRM_AMD_DC_FP
+    endif
+endif
+
+# v5.17-rc4-3-ge8c07082a810 (Kbuild: move to -std=gnu11)
+# Upstream patches now uses gnu11/gnu99 as the default C standard version.
+# However, gcc in legacy OS still uses gnu89, which will introduce a standard
+# build gap leading to a DKMS build failure possibly. So add below check to
+# move gnu89 to gnu99 if KBUILD_CFLAGS still uses gnu89.
+ifeq ($(findstring gnu89,$(KBUILD_CFLAGS)),gnu89)
+KBUILD_CFLAGS := $(subst gnu89,gnu99,$(KBUILD_CFLAGS))
+$(warning "The local C standard(gnu89) doesn't match kernel default C standard(gnu11/gnu99)")
+endif
+
+include  $(src)/amd/dkms/Makefile.drm_ttm_helper
+include  $(src)/amd/dkms/Makefile.drm_exec
+include  $(src)/amd/dkms/Makefile.drm_buddy
+
+obj-m += scheduler/ amd/amdgpu/ amd/amdxcp/ ttm/ amd/amdkcl/
